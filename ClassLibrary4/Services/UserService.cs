@@ -1,19 +1,25 @@
-﻿using TaskManagement.Application.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using TaskManagement.Application.Interfaces;
 using TaskManagement.Domain.Entities;
+using TaskManagement.Infrastructure.Persistence;
 
 
 namespace TaskManagement.Infrastructure.Services
 {
     public class UserService : IUserService
     {
-        public Task<List<User>> GetAllAsync()
-        {
-            var users = new List<User>
-        {
-            new User { Id = Guid.NewGuid(), UserName = "test", Email = "test@example.com" }
-        };
+        private readonly AppDbContext _dbContext;
 
-            return Task.FromResult(users);
+        public UserService(AppDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
+        public async Task<List<User>> GetAllAsync()
+        {
+            var users = await _dbContext.Users.AsNoTracking().ToListAsync();
+
+            return users;
         }
     }
 }
