@@ -1,14 +1,21 @@
+using Microsoft.EntityFrameworkCore;
 using TaskManagement.Application.Interfaces;
+using TaskManagement.Infrastructure.Persistence;
 using TaskManagement.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
 
 
 
