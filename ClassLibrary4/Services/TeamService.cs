@@ -39,7 +39,7 @@ namespace TaskManagement.Infrastructure.Services
             return team;
         }
 
-        public async Task<List<Team>> GetAllAsync(Team team)
+        public async Task<List<Team>> GetAllAsync()
         {
             var teams = await _dbContext.Teams
                 .AsNoTracking()

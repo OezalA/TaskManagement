@@ -11,7 +11,7 @@ namespace TaskManagement.Application.Interfaces
     {
         Task<Team> CreatAsync(Team team);
         Task<Team?> GetByIdAsync(Guid id);
-        Task<List<Team>> GetAllAsync(Team team);
+        Task<List<Team>> GetAllAsync();
 
 
         Task<bool> DeleteAsync(Guid id);
