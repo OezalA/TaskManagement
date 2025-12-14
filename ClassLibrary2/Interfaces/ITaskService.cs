@@ -10,7 +10,7 @@ namespace TaskManagement.Application.Interfaces
     public interface ITaskService
     {
         Task<TaskItem> CreateAsync(TaskItem task);
-        Task<TaskItem?> GeByIdAsync(Guid id);
+        Task<TaskItem?> GetByIdAsync(Guid id);
         //Task<List<TaskItem>> GetAllAsync();
         Task<List<TaskItem>>GetByProjectAsync(Guid projectID);
         Task<bool> UpdateAsync(TaskItem taskItem);

@@ -28,7 +28,7 @@ namespace TaskManagement.Infrastructure.Services
             return task;
         }
 
-        public async Task<TaskItem?> GeByIdAsync(Guid id)
+        public async Task<TaskItem?> GetByIdAsync(Guid id)
         {
             var task =  await _dbContext.TaskItems
                 .Include(t => t.Project)

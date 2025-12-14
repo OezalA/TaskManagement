@@ -16,21 +16,21 @@ namespace TaskManagement.Api.Controllers
             _projectService = projectService;
         }
 
-        [HttpPost("create")]
+        [HttpPost]
         public async Task<IActionResult> Create(Project project)
         {
             var createdProject = await _projectService.CreateAsync(project);
             return CreatedAtAction(nameof(GetById), new { id = createdProject.Id }, createdProject);
         }
 
-        [HttpGet("getAll")]
+        [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var projects = await _projectService.GetAllAsync();
             return Ok(projects);
         }
 
-        [HttpGet("GetById {id:guid}")]
+        [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var project = await _projectService.GeByIdAsync(id);
