@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
+using TaskManagement.Application.DTOs;
 using TaskManagement.Application.Interfaces;
 using TaskManagement.Domain.Entities;
 
@@ -17,10 +18,21 @@ namespace TaskManagement.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Project project)
+        public async Task<IActionResult> Create([FromBody] CreateProjectRequest request)
         {
+            var project = new Project
+            {
+                Name = request.Name,
+                Description = request.Description
+            };
+
             var createdProject = await _projectService.CreateAsync(project);
-            return CreatedAtAction(nameof(GetById), new { id = createdProject.Id }, createdProject);
+
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = createdProject.Id },
+                createdProject
+            );
         }
 
         [HttpGet]

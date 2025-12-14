@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TaskManagement.Application.DTOs;
 using TaskManagement.Application.Interfaces;
 using TaskManagement.Domain.Entities;
 using TaskManagement.Infrastructure.Services;
@@ -16,10 +17,23 @@ namespace TaskManagement.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(TaskItem task)
+        public async Task<IActionResult> Create([FromBody] CreateTaskRequest request)
         {
+            var task = new TaskItem
+            {
+                Title = request.Title,
+                Description = request.Description,
+                ProjectId = request.ProjectId,
+                DueDate = request.DueDate
+            };
+
             var createdTask = await _taskService.CreateAsync(task);
-            return CreatedAtAction(nameof(GetById), new { id = createdTask.Id }, createdTask);
+
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = createdTask.Id },
+                createdTask
+            );
         }
 
         [HttpGet("{id:guid}")]

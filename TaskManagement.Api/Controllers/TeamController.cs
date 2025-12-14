@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TaskManagement.Application.DTOs;
 using TaskManagement.Application.Interfaces;
 using TaskManagement.Domain.Entities;
 using TaskManagement.Infrastructure.Services;
@@ -16,12 +17,21 @@ namespace TaskManagement.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Team team)
+        public async Task<IActionResult> Create([FromBody] CreateTeamRequest request)
         {
-            var createdTeam = await _teamService.CreatAsync(team);
-            return CreatedAtAction(nameof(GetById), new { team.Id }, createdTeam);
-        }
+            var team = new Team
+            {
+                Name = request.Name
+            };
 
+            var createdTeam = await _teamService.CreateAsync(team);
+
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = createdTeam.Id },
+                createdTeam
+            );
+        }
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {

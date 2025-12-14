@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TaskManagement.Application.DTOs;
 using TaskManagement.Domain.Entities;
 
 namespace TaskManagement.Application.Interfaces

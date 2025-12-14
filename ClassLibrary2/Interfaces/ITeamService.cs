@@ -9,7 +9,7 @@ namespace TaskManagement.Application.Interfaces
 {
     public interface ITeamService
     {
-        Task<Team> CreatAsync(Team team);
+        Task<Team> CreateAsync(Team team);
         Task<Team?> GetByIdAsync(Guid id);
         Task<List<Team>> GetAllAsync();
 

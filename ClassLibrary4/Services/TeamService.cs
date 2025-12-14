@@ -20,7 +20,7 @@ namespace TaskManagement.Infrastructure.Services
             _dbContext = dbContext;
         }
         
-        public async Task<Team> CreatAsync(Team team)
+        public async Task<Team> CreateAsync(Team team)
         {
             _dbContext.Teams.Add(team);
             await _dbContext.SaveChangesAsync();
