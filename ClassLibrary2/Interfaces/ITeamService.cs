@@ -17,7 +17,7 @@ namespace TaskManagement.Application.Interfaces
         Task<bool> DeleteAsync(Guid id);
         Task<bool> AddUserToTeamAsync(Guid teamId, Guid userId);
         Task<bool> RemoveUserFromTeamAsync(Guid teamId, Guid userId);
-        Task<List<User>> GetTeamMembersAsync(Guid teamId);
+        Task<List<TeamUser>> GetTeamMembersAsync(Guid teamId);
 
     }
 }

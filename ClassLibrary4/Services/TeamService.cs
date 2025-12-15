@@ -42,6 +42,7 @@ namespace TaskManagement.Infrastructure.Services
         public async Task<List<Team>> GetAllAsync()
         {
             var teams = await _dbContext.Teams
+                .Include(t => t.Members)
                 .AsNoTracking()
                 .ToListAsync();
 
@@ -74,7 +75,7 @@ namespace TaskManagement.Infrastructure.Services
             var alreadyMember = await _dbContext.TeamUsers
                 .AllAsync(tu => tu.UserId == userId && tu.TeamId == teamId);
 
-            if(!alreadyMember) return false;
+            if(alreadyMember) return false;
 
             _dbContext.TeamUsers.Add(new TeamUser
             {
@@ -86,19 +87,29 @@ namespace TaskManagement.Infrastructure.Services
 
             return true;
         }
-
-        public async Task<List<User>> GetTeamMembersAsync(Guid teamId)
+        
+        public async Task<List<TeamUser>> GetTeamMembersAsync(Guid teamId)
         {
             return await _dbContext.TeamUsers
-                .Where(tu => tu.UserId == teamId)
-                .Select(tu => tu.User)
+                .Include(tu => tu.User)
+                .Where(tu => tu.TeamId == teamId)
                 .AsNoTracking()
                 .ToListAsync();
         }
 
-        public Task<bool> RemoveUserFromTeamAsync(Guid teamId, Guid userId)
+        public async Task<bool> RemoveUserFromTeamAsync(Guid teamId, Guid userId)
         {
-            throw new NotImplementedException();
+            var teamUser = await _dbContext.TeamUsers
+                .FirstOrDefaultAsync(tu => tu.TeamId == teamId && tu.UserId == userId);
+
+            if (teamUser == null)
+                return false;
+
+            _dbContext.TeamUsers.Remove(teamUser);
+            await _dbContext.SaveChangesAsync();
+
+            return true;
         }
+
     }
 }

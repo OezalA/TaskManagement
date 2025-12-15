@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TaskManagement.Application.DTOs;
+using TaskManagement.Application.DTOs.Responses;
 using TaskManagement.Application.Interfaces;
 using TaskManagement.Domain.Entities;
 using TaskManagement.Infrastructure.Services;
@@ -36,21 +37,37 @@ namespace TaskManagement.Api.Controllers
         public async Task<IActionResult> GetAll()
         {
             var teams = await _teamService.GetAllAsync();
-            return Ok(teams);
+
+            var response = teams.Select(t => new TeamResponse
+            {
+                Id = t.Id,
+                Name = t.Name
+            });
+
+            return Ok(response);
         }
 
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var team = await _teamService.GetByIdAsync(id);
-            if(team == null) return NotFound();
-            return Ok(team);
+            if (team == null)
+                return NotFound();
+
+            var response = new TeamResponse
+            {
+                Id = team.Id,
+                Name = team.Name
+                
+            };
+
+            return Ok(response);
         }
 
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var deleted = _teamService.DeleteAsync(id);
+            var deleted = await _teamService.DeleteAsync(id);
             if(deleted == null) return NotFound();
 
             return NoContent();
@@ -73,14 +90,20 @@ namespace TaskManagement.Api.Controllers
             return NoContent();
         }
 
-        [HttpGet("{teamId:guid}")]
+        [HttpGet("{teamId:guid}/members")]
         public async Task<IActionResult> GetMembers(Guid teamId)
         {
-           var members = await _teamService.GetTeamMembersAsync(teamId);
-            
-            return Ok(members);
+            var members = await _teamService.GetTeamMembersAsync(teamId);
+
+            var response = members.Select(m => new TeamMemberResponse
+            {
+                UserId = m.UserId,
+                UserName = m.User?.UserName
+            });
+
+            return Ok(response);
         }
 
-                
+        
     }
 }

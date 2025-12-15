@@ -24,7 +24,9 @@ namespace TaskManagement.Api.Controllers
                 Title = request.Title,
                 Description = request.Description,
                 ProjectId = request.ProjectId,
-                DueDate = request.DueDate
+                DueDate = request.DueDate.HasValue
+        ? DateTime.SpecifyKind(request.DueDate.Value, DateTimeKind.Utc)
+        : null
             };
 
             var createdTask = await _taskService.CreateAsync(task);
