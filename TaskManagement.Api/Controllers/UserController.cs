@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using TaskManagement.Application.DTOs.Responses;
 using TaskManagement.Application.Interfaces;
 
 namespace TaskManagement.Api.Controllers
@@ -20,5 +21,37 @@ namespace TaskManagement.Api.Controllers
             var users = await _userService.GetAllAsync();
             return Ok(users);
         }
+
+        [HttpGet("{userId:guid}/tasks")]
+        public async Task<IActionResult> GetUserTasks(Guid userId)
+        {
+            var tasks = await _userService.GetUserTasksAsync(userId);
+
+            var response = tasks.Select(t => new UserTaskResponse
+            {
+                TaskId = t.Id,
+                Title = t.Title,
+                Status = t.Status.ToString(),
+                ProjectId = t.Project.Id,
+                ProjectName = t.Project.Name
+            });
+
+            return Ok(response);
+        }
+
+        [HttpGet("{userId:guid}/projects")]
+        public async Task<IActionResult> GetUserProjects(Guid userId)
+        {
+            var projects = await _userService.GetUserProjectsAsync(userId);
+
+            var response = projects.Select(p => new UserProjectResponse
+            {
+                ProjectId = p.Id,
+                ProjectName = p.Name
+            });
+
+            return Ok(response);
+        }
+
     }
 }

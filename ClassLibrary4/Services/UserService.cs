@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Query.Expressions.Internal;
+using TaskManagement.Application.DTOs.Responses;
 using TaskManagement.Application.Interfaces;
 using TaskManagement.Domain.Entities;
 using TaskManagement.Infrastructure.Persistence;
@@ -21,5 +23,27 @@ namespace TaskManagement.Infrastructure.Services
 
             return users;
         }
+
+        public async Task<List<TaskItem>> GetUserTasksAsync(Guid userId)
+        {
+            return await _dbContext.TaskItems
+                .Include(t => t.Project)
+                .Where(t => t.AssignedUserId == userId)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task<List<Project>> GetUserProjectsAsync(Guid userId)
+        {
+            return await _dbContext.TaskItems
+                .Where(t => t.AssignedUserId == userId)
+                .Select(t => t.Project)
+                .Distinct()
+                .AsNoTracking()
+                .ToListAsync();
+
+        }
+
+        
     }
 }
