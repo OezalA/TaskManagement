@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TaskManagement.Application.DTOs;
 using TaskManagement.Domain.Entities;
 
 namespace TaskManagement.Application.Interfaces
@@ -14,6 +15,8 @@ namespace TaskManagement.Application.Interfaces
         //Task<List<TaskItem>> GetAllAsync();
         Task<List<TaskItem>>GetByProjectAsync(Guid projectID);
         Task UpdateAsync(TaskItem taskItem);
+        Task UpdatePartialAsync(Guid taskId, UpdateTaskRequest request);
+
         Task MarkAsDoneAsync(Guid taskId);
         Task DeleteAsync(Guid Id);
         Task AssignUserAsync (Guid taskId, Guid userId);

@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagement.Application.DTOs.Responses;
 using TaskManagement.Application.Interfaces;
@@ -13,6 +15,13 @@ namespace TaskManagement.Api.Controllers
         public UserController(IUserService userService)
         {
             _userService = userService;
+        }
+
+        [Authorize]
+        [HttpGet("secure-test")]
+        public IActionResult SecureTest()
+        {
+            return Ok("Authenticated");
         }
 
         [HttpGet]
@@ -52,5 +61,39 @@ namespace TaskManagement.Api.Controllers
 
             return Ok(response);
         }
+
+        
+
+        [Authorize]
+        [HttpGet("me")]
+        public IActionResult GetMyUser()
+        {
+            var user = HttpContext.User;
+
+            var response = new
+            {
+                // Core identity
+                ObjectId = user.FindFirstValue("oid"),
+                TenantId = user.FindFirstValue("tid"),
+                UserPrincipalName = user.FindFirstValue("preferred_username"),
+                Name = user.FindFirstValue("name"),
+                Email =
+                    user.FindFirstValue(ClaimTypes.Email)
+                    ?? user.FindFirstValue("preferred_username"),
+
+                // Authorization info
+                Scopes = user.FindFirstValue("scp")?.Split(' '),
+
+                // Raw claims (çok faydal? debug için)
+                Claims = user.Claims.Select(c => new
+                {
+                    c.Type,
+                    c.Value
+                })
+            };
+
+            return Ok(response);
+        }
+
     }
 }

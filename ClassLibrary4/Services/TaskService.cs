@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using TaskManagement.Application.DTOs;
 using TaskManagement.Application.Exceptions;
 using TaskManagement.Application.Interfaces;
 using TaskManagement.Domain.Entities;
@@ -67,6 +68,43 @@ namespace TaskManagement.Infrastructure.Services
                 throw new NotFoundException("Task not found", "TaskNotFound");
 
             _dbContext.TaskItems.Update(taskItem);
+            await _dbContext.SaveChangesAsync();
+        }
+        public async Task UpdatePartialAsync(Guid taskId, UpdateTaskRequest request)
+        {
+            var task = await _dbContext.TaskItems.FindAsync(taskId);
+            if (task == null)
+                throw new NotFoundException("Task not found", "TaskNotFound");
+
+            var hasAnyChange = false;
+
+            if (request.Title != null)
+            {
+                task.Title = request.Title;
+                hasAnyChange = true;
+            }
+
+            if (request.Description != null)
+            {
+                task.Description = request.Description;
+                hasAnyChange = true;
+            }
+
+            if (request.DueDate.HasValue)
+            {
+                task.DueDate = DateTime.SpecifyKind(
+                    request.DueDate.Value,
+                    DateTimeKind.Utc
+                );
+                hasAnyChange = true;
+            }
+
+            if (!hasAnyChange)
+                throw new ValidationException(
+                    "No fields provided for update",
+                    "EmptyPatchRequest"
+                );
+
             await _dbContext.SaveChangesAsync();
         }
 
