@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Query.Expressions.Internal;
-using TaskManagement.Application.DTOs.Responses;
+using TaskManagement.Application.Exceptions;
 using TaskManagement.Application.Interfaces;
 using TaskManagement.Domain.Entities;
 using TaskManagement.Infrastructure.Persistence;
-
 
 namespace TaskManagement.Infrastructure.Services
 {
@@ -19,13 +17,16 @@ namespace TaskManagement.Infrastructure.Services
 
         public async Task<List<User>> GetAllAsync()
         {
-            var users = await _dbContext.Users.AsNoTracking().ToListAsync();
-
-            return users;
+            return await _dbContext.Users
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         public async Task<List<TaskItem>> GetUserTasksAsync(Guid userId)
         {
+            if (!await _dbContext.Users.AnyAsync(u => u.Id == userId))
+                throw new NotFoundException("User not found", "UserNotFound");
+
             return await _dbContext.TaskItems
                 .Include(t => t.Project)
                 .Where(t => t.AssignedUserId == userId)
@@ -35,15 +36,15 @@ namespace TaskManagement.Infrastructure.Services
 
         public async Task<List<Project>> GetUserProjectsAsync(Guid userId)
         {
+            if (!await _dbContext.Users.AnyAsync(u => u.Id == userId))
+                throw new NotFoundException("User not found", "UserNotFound");
+
             return await _dbContext.TaskItems
                 .Where(t => t.AssignedUserId == userId)
                 .Select(t => t.Project)
                 .Distinct()
                 .AsNoTracking()
                 .ToListAsync();
-
         }
-
-        
     }
 }

@@ -42,9 +42,6 @@ namespace TaskManagement.Api.Controllers
         public async Task<IActionResult> GetById(Guid id)
         {
             var task = await _taskService.GetByIdAsync(id);
-            if (task == null)
-                return NotFound();
-
             return Ok(task);
         }
 
@@ -61,40 +58,28 @@ namespace TaskManagement.Api.Controllers
             if (id != task.Id)
                 return BadRequest("Task ID mismatch");
 
-            var updated = await _taskService.UpdateAsync(task);
-            if (!updated)
-                return NotFound();
-
+            await _taskService.UpdateAsync(task);
             return NoContent();
         }
 
         [HttpPut("{id:guid}/assign/{userId:guid}")]
         public async Task<IActionResult> AssignUser(Guid id, Guid userId)
         {
-            var result = await _taskService.AssignUserAsync(id, userId);
-            if (!result)
-                return NotFound();
-
+            await _taskService.AssignUserAsync(id, userId);
             return NoContent();
         }
 
         [HttpPut("{id:guid}/done")]
         public async Task<IActionResult> MarkAsDone(Guid id)
         {
-            var result = await _taskService.MarkAsDoneAsync(id);
-            if (!result)
-                return NotFound();
-
+            await _taskService.MarkAsDoneAsync(id);
             return NoContent();
         }
 
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var deleted = await _taskService.DeleteAsync(id);
-            if (!deleted)
-                return NotFound();
-
+            await _taskService.DeleteAsync(id);
             return NoContent();
         }
     }

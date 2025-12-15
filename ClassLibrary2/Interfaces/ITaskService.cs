@@ -13,10 +13,10 @@ namespace TaskManagement.Application.Interfaces
         Task<TaskItem?> GetByIdAsync(Guid id);
         //Task<List<TaskItem>> GetAllAsync();
         Task<List<TaskItem>>GetByProjectAsync(Guid projectID);
-        Task<bool> UpdateAsync(TaskItem taskItem);
-        Task<bool> MarkAsDoneAsync(Guid taskId);
-        Task<bool> DeleteAsync(Guid Id);
-        Task<bool> AssignUserAsync (Guid taskId, Guid userId);
+        Task UpdateAsync(TaskItem taskItem);
+        Task MarkAsDoneAsync(Guid taskId);
+        Task DeleteAsync(Guid Id);
+        Task AssignUserAsync (Guid taskId, Guid userId);
         
     }
 }

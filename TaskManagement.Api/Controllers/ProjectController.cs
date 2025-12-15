@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.FileProviders;
 using TaskManagement.Application.DTOs;
 using TaskManagement.Application.Interfaces;
 using TaskManagement.Domain.Entities;
@@ -45,33 +44,25 @@ namespace TaskManagement.Api.Controllers
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var project = await _projectService.GeByIdAsync(id);
-            if (project == null) return NotFound();
-
+            var project = await _projectService.GetByIdAsync(id);
             return Ok(project);
         }
 
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> Update(Guid id, Project project)
         {
-            if(id != project.Id) return BadRequest("Project ID mismatch");
+            if (id != project.Id)
+                return BadRequest("Project ID mismatch");
 
-            var updated = await _projectService.UpdateAsync(project);
-
-            if (!updated) return NotFound();
-
+            await _projectService.UpdateAsync(project);
             return NoContent();
         }
 
         [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> Delete (Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            var deleted = await _projectService.DeleteAsync(id);
-            if (!deleted) return NotFound();
-
+            await _projectService.DeleteAsync(id);
             return NoContent();
         }
-
-
     }
 }

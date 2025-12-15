@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using TaskManagement.Application.Exceptions;
 using TaskManagement.Application.Interfaces;
 using TaskManagement.Domain.Entities;
 using TaskManagement.Infrastructure.Persistence;
@@ -22,19 +23,25 @@ namespace TaskManagement.Infrastructure.Services
 
         public async Task<TaskItem> CreateAsync(TaskItem task)
         {
+            if (!await _dbContext.Projects.AnyAsync(p => p.Id == task.ProjectId))
+                throw new NotFoundException("Project not found", "ProjectNotFound");
+            
             _dbContext.TaskItems.Add(task);
            await _dbContext.SaveChangesAsync();
 
             return task;
         }
 
-        public async Task<TaskItem?> GetByIdAsync(Guid id)
+        public async Task<TaskItem> GetByIdAsync(Guid id)
         {
             var task =  await _dbContext.TaskItems
                 .Include(t => t.Project)
                 .Include(t => t.AssignedUser)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(i => i.Id == id);
+
+            if (task == null)
+                throw new NotFoundException("Task not found", "TaskNotFound");
 
             return task;
 
@@ -51,56 +58,60 @@ namespace TaskManagement.Infrastructure.Services
             return task;
         }
 
-        public async Task<bool> UpdateAsync(TaskItem taskItem)
+        public async Task UpdateAsync(TaskItem taskItem)
         {
-            var exist = await _dbContext.TaskItems.AnyAsync(t => t.Id == taskItem.Id);
-            if(!exist)
-                return false;
+            var exists = await _dbContext.TaskItems
+                .AnyAsync(t => t.Id == taskItem.Id);
+
+            if (!exists)
+                throw new NotFoundException("Task not found", "TaskNotFound");
 
             _dbContext.TaskItems.Update(taskItem);
             await _dbContext.SaveChangesAsync();
-
-            return true;
         }
 
-        public async Task<bool> MarkAsDoneAsync(Guid taskId)
+        public async Task MarkAsDoneAsync(Guid taskId)
         {
             var task = await _dbContext.TaskItems.FindAsync(taskId);
-            if(task == null) return false;
+            if (task == null)
+                throw new NotFoundException("Task not found", "TaskNotFound");
+
+            if (task.Status == TaskStatus.Done)
+                throw new ConflictException(
+                    "Task is already completed",
+                    "TaskAlreadyCompleted"
+                );
 
             task.Status = TaskStatus.Done;
             await _dbContext.SaveChangesAsync();
-
-            return true;
-
         }
 
-        public async Task<bool> DeleteAsync(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
             var task = await _dbContext.TaskItems.FindAsync(id);
-            if (task == null) return false;
+            if (task == null)
+                throw new NotFoundException("Task not found", "TaskNotFound");
 
             _dbContext.TaskItems.Remove(task);
             await _dbContext.SaveChangesAsync();
-
-            return true;
-
-            
         }
-
-        public async Task<bool> AssignUserAsync(Guid taskId, Guid userId)
+        public async Task AssignUserAsync(Guid taskId, Guid userId)
         {
             var task = await _dbContext.TaskItems.FindAsync(taskId);
-            if (task == null) return false;
+            if (task == null)
+                throw new NotFoundException("Task not found", "TaskNotFound");
 
-            var userExist = await _dbContext.Users.AnyAsync(u => u.Id == userId);
-            if(!userExist) return false;
+            if (!await _dbContext.Users.AnyAsync(u => u.Id == userId))
+                throw new NotFoundException("User not found", "UserNotFound");
+
+            if (task.AssignedUserId == userId)
+                throw new ConflictException(
+                    "User is already assigned to this task",
+                    "UserAlreadyAssigned"
+                );
 
             task.AssignedUserId = userId;
             await _dbContext.SaveChangesAsync();
-
-            return true;
-
         }
     }
 }

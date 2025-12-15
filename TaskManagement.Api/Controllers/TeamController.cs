@@ -3,7 +3,6 @@ using TaskManagement.Application.DTOs;
 using TaskManagement.Application.DTOs.Responses;
 using TaskManagement.Application.Interfaces;
 using TaskManagement.Domain.Entities;
-using TaskManagement.Infrastructure.Services;
 
 namespace TaskManagement.Api.Controllers
 {
@@ -12,6 +11,7 @@ namespace TaskManagement.Api.Controllers
     public class TeamController : ControllerBase
     {
         private readonly ITeamService _teamService;
+
         public TeamController(ITeamService teamService)
         {
             _teamService = teamService;
@@ -33,6 +33,7 @@ namespace TaskManagement.Api.Controllers
                 createdTeam
             );
         }
+
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -51,14 +52,11 @@ namespace TaskManagement.Api.Controllers
         public async Task<IActionResult> GetById(Guid id)
         {
             var team = await _teamService.GetByIdAsync(id);
-            if (team == null)
-                return NotFound();
 
             var response = new TeamResponse
             {
                 Id = team.Id,
                 Name = team.Name
-                
             };
 
             return Ok(response);
@@ -67,26 +65,21 @@ namespace TaskManagement.Api.Controllers
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var deleted = await _teamService.DeleteAsync(id);
-            if(deleted == null) return NotFound();
-
+            await _teamService.DeleteAsync(id);
             return NoContent();
         }
 
         [HttpPost("{teamId:guid}/users/{userId:guid}")]
         public async Task<IActionResult> AddUser(Guid teamId, Guid userId)
         {
-            var result = await _teamService.AddUserToTeamAsync(teamId, userId);
-            if(!result) return NotFound();
-
+            await _teamService.AddUserToTeamAsync(teamId, userId);
             return NoContent();
         }
 
         [HttpDelete("{teamId:guid}/users/{userId:guid}")]
         public async Task<IActionResult> RemoveUser(Guid teamId, Guid userId)
         {
-            var result = await _teamService.RemoveUserFromTeamAsync(teamId, userId);
-            if(!result) return NotFound();
+            await _teamService.RemoveUserFromTeamAsync(teamId, userId);
             return NoContent();
         }
 
@@ -103,7 +96,5 @@ namespace TaskManagement.Api.Controllers
 
             return Ok(response);
         }
-
-        
     }
 }

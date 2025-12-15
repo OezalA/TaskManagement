@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using TaskManagement.Application.Exceptions;
 using TaskManagement.Application.Interfaces;
 using TaskManagement.Domain.Entities;
 using TaskManagement.Infrastructure.Persistence;
@@ -16,7 +12,7 @@ namespace TaskManagement.Infrastructure.Services
 
         public ProjectService(AppDbContext dbContext)
         {
-            _dbContext =  dbContext;
+            _dbContext = dbContext;
         }
 
         public async Task<Project> CreateAsync(Project project)
@@ -26,15 +22,17 @@ namespace TaskManagement.Infrastructure.Services
             return project;
         }
 
-        public async Task<Project> GeByIdAsync(Guid id)
+        public async Task<Project> GetByIdAsync(Guid id)
         {
             var project = await _dbContext.Projects
                 .Include(p => p.Tasks)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Id == id);
 
-            return project;
+            if (project == null)
+                throw new NotFoundException("Project not found", "ProjectNotFound");
 
+            return project;
         }
 
         public async Task<List<Project>> GetAllAsync()
@@ -44,31 +42,26 @@ namespace TaskManagement.Infrastructure.Services
                 .ToListAsync();
         }
 
-        public async Task<bool> UpdateAsync (Project project)
+        public async Task UpdateAsync(Project project)
         {
-            var exist = await _dbContext.Projects.AnyAsync(p => p.Id == project.Id);
-            if (!exist)
-                return false;
+            var exists = await _dbContext.Projects
+                .AnyAsync(p => p.Id == project.Id);
+
+            if (!exists)
+                throw new NotFoundException("Project not found", "ProjectNotFound");
 
             _dbContext.Projects.Update(project);
             await _dbContext.SaveChangesAsync();
-
-            return true;
-            
         }
 
-        public async Task<bool> DeleteAsync(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
             var project = await _dbContext.Projects.FindAsync(id);
             if (project == null)
-                return false;
+                throw new NotFoundException("Project not found", "ProjectNotFound");
 
             _dbContext.Projects.Remove(project);
             await _dbContext.SaveChangesAsync();
-
-            return true;
         }
-
-
     }
 }

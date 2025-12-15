@@ -10,13 +10,13 @@ namespace TaskManagement.Application.Interfaces
     public interface ITeamService
     {
         Task<Team> CreateAsync(Team team);
-        Task<Team?> GetByIdAsync(Guid id);
+        Task<Team> GetByIdAsync(Guid id);
         Task<List<Team>> GetAllAsync();
 
 
-        Task<bool> DeleteAsync(Guid id);
-        Task<bool> AddUserToTeamAsync(Guid teamId, Guid userId);
-        Task<bool> RemoveUserFromTeamAsync(Guid teamId, Guid userId);
+        Task DeleteAsync(Guid id);
+        Task AddUserToTeamAsync(Guid teamId, Guid userId);
+        Task RemoveUserFromTeamAsync(Guid teamId, Guid userId);
         Task<List<TeamUser>> GetTeamMembersAsync(Guid teamId);
 
     }
