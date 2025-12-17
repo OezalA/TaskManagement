@@ -1,0 +1,21 @@
+name Docker build (master)
+
+on
+  push
+    branches
+      - master
+
+jobs
+  build
+    runs-on ubuntu-latest
+
+    steps
+      - name Checkout
+        uses actionscheckout@v4
+
+      - name Set up Docker Buildx
+        uses dockersetup-buildx-action@v3
+
+      - name Build Docker image
+        run 
+          docker build -t taskmanagement-apilatest .
