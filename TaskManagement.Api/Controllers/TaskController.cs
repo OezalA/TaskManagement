@@ -74,6 +74,20 @@ namespace TaskManagement.Api.Controllers
             await _taskService.UpdatePartialAsync(id, request);
             return NoContent();
         }
+
+        [HttpPost("{id:guid}/complete")]
+        public async Task<IActionResult> Complete(Guid id)
+        {
+            await _taskService.CompleteAsync(id);
+            return NoContent();
+        }
+        [HttpPost("{id:guid}/assign-to-me")]
+        public async Task<IActionResult> AssignToMe(Guid id)
+        {
+            await _taskService.AssignToMeAsync(id);
+            return NoContent();
+        }
+
         [Authorize]
         [Authorize(Roles = "Admin,User")]
         [HttpPut("{id:guid}/assign/{userId:guid}")]

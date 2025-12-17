@@ -1,25 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using TaskManagement.Application.DTOs;
 using TaskManagement.Application.Exceptions;
 using TaskManagement.Application.Interfaces;
 using TaskManagement.Domain.Entities;
 using TaskManagement.Infrastructure.Persistence;
-using TaskStatus = TaskManagement.Domain.Entities.TaskStatus;
+using TaskManagement.Domain.Enums;
 
 namespace TaskManagement.Infrastructure.Services
 {
     public class TaskService : ITaskService
     {
         private AppDbContext _dbContext;
-
-        public TaskService(AppDbContext dbContext)
+        private readonly ICurrentUserService _currentUserService;
+        public TaskService(AppDbContext dbContext, ICurrentUserService currentUserService)
         {
             _dbContext = dbContext;
+            _currentUserService = currentUserService;
         }
 
         public async Task<TaskItem> CreateAsync(TaskItem task)
@@ -76,34 +72,35 @@ namespace TaskManagement.Infrastructure.Services
             if (task == null)
                 throw new NotFoundException("Task not found", "TaskNotFound");
 
-            var hasAnyChange = false;
-
             if (request.Title != null)
-            {
                 task.Title = request.Title;
-                hasAnyChange = true;
-            }
 
             if (request.Description != null)
-            {
                 task.Description = request.Description;
-                hasAnyChange = true;
-            }
 
             if (request.DueDate.HasValue)
+                task.DueDate = DateTime.SpecifyKind(request.DueDate.Value, DateTimeKind.Utc);
+
+            if (request.Status.HasValue)
+                task.Status = request.Status.Value;
+
+            if (request.AssignedUserId.HasValue)
             {
-                task.DueDate = DateTime.SpecifyKind(
-                    request.DueDate.Value,
-                    DateTimeKind.Utc
-                );
-                hasAnyChange = true;
+                var userExists = await _dbContext.Users.AnyAsync(u => u.Id == request.AssignedUserId.Value);
+                if (!userExists)
+                    throw new NotFoundException("User not found", "UserNotFound");
+
+                task.AssignedUserId = request.AssignedUserId;
             }
 
-            if (!hasAnyChange)
-                throw new ValidationException(
-                    "No fields provided for update",
-                    "EmptyPatchRequest"
-                );
+            if (request.ProjectId.HasValue)
+            {
+                var projectExists = await _dbContext.Projects.AnyAsync(p => p.Id == request.ProjectId.Value);
+                if (!projectExists)
+                    throw new NotFoundException("Project not found", "ProjectNotFound");
+
+                task.ProjectId = request.ProjectId.Value;
+            }
 
             await _dbContext.SaveChangesAsync();
         }
@@ -114,13 +111,13 @@ namespace TaskManagement.Infrastructure.Services
             if (task == null)
                 throw new NotFoundException("Task not found", "TaskNotFound");
 
-            if (task.Status == TaskStatus.Done)
+            if (task.Status == TaskItemStatus.Done)
                 throw new ConflictException(
                     "Task is already completed",
                     "TaskAlreadyCompleted"
                 );
 
-            task.Status = TaskStatus.Done;
+            task.Status = TaskItemStatus.Done;
             await _dbContext.SaveChangesAsync();
         }
 
@@ -151,5 +148,34 @@ namespace TaskManagement.Infrastructure.Services
             task.AssignedUserId = userId;
             await _dbContext.SaveChangesAsync();
         }
+
+        public async Task CompleteAsync(Guid taskId)
+        {
+            var task = await _dbContext.TaskItems.FindAsync(taskId);
+            if (task == null)
+                throw new NotFoundException("Task not found", "TaskNotFound");
+
+            if (task.Status == TaskItemStatus.Done)
+                throw new ConflictException(
+                    "Task is already completed",
+                    "TaskAlreadyCompleted"
+                );
+
+            task.Status = TaskItemStatus.Done;
+            task.DueDate = DateTime.UtcNow; 
+            await _dbContext.SaveChangesAsync();
+        }
+        public async Task AssignToMeAsync(Guid taskId)
+        {
+            var task = await _dbContext.TaskItems.FindAsync(taskId);
+            if (task == null)
+                throw new NotFoundException("Task not found", "TaskNotFound");
+
+            var currentUser = await _currentUserService.GetCurrentUserAsync();
+
+            task.AssignedUserId = currentUser.Id;
+            await _dbContext.SaveChangesAsync();
+        }
+
     }
 }

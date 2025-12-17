@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using TaskManagement.Domain.Enums;
 
 namespace TaskManagement.Application.DTOs
 {
@@ -11,6 +8,10 @@ namespace TaskManagement.Application.DTOs
         public string? Title { get; set; }
         public string? Description { get; set; }
         public DateTime? DueDate { get; set; }
+        public TaskItemStatus? Status { get; set; }
+
+        public Guid? AssignedUserId { get; set; }
+        public Guid? ProjectId { get; set; }
 
     }
 }

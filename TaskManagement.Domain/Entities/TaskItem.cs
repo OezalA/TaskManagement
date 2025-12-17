@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿
+using TaskManagement.Domain.Enums;
 
 namespace TaskManagement.Domain.Entities
 {
@@ -9,7 +8,7 @@ namespace TaskManagement.Domain.Entities
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; }
         public DateTime? DueDate { get; set; }
-        public TaskStatus Status { get; set; }
+        public TaskItemStatus Status { get; set; }
 
         // Foreign
         public Guid? AssignedUserId { get; set; }
@@ -20,10 +19,5 @@ namespace TaskManagement.Domain.Entities
         
     }
 
-    public enum TaskStatus
-    {
-        Todo = 0,
-        InProgress = 1,
-        Done = 2
-    }
+    
 }
