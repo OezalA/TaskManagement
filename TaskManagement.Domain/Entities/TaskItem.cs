@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TaskManagement.Domain.Common;
 
 namespace TaskManagement.Domain.Entities
 {
