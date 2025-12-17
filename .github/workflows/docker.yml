@@ -16,5 +16,13 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Read version
+        id: version
+        run: echo "VERSION=$(cat VERSION)" >> $GITHUB_OUTPUT
+
       - name: Build Docker image
-        run: docker build -t taskmanagement-api:latest .
+        run: |
+          docker build \
+            -t taskmanagement-api:latest \
+            -t taskmanagement-api:v${{ steps.version.outputs.VERSION }} \
+            .
