@@ -11,10 +11,12 @@ namespace TaskManagement.Api.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly ICurrentUserService _currentUserService;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, ICurrentUserService currentUserService)
         {
             _userService = userService;
+            _currentUserService = currentUserService;
         }
 
         [Authorize]
@@ -66,33 +68,45 @@ namespace TaskManagement.Api.Controllers
 
         [Authorize]
         [HttpGet("me")]
-        public IActionResult GetMyUser()
+        public async Task<IActionResult> GetMyUser()
         {
-            var user = HttpContext.User;
+            //var user = HttpContext.User;
 
-            var response = new
+            //var response = new
+            //{
+            //    // Core identity
+            //    ObjectId = user.FindFirstValue("oid"),
+            //    TenantId = user.FindFirstValue("tid"),
+            //    UserPrincipalName = user.FindFirstValue("preferred_username"),
+            //    Name = user.FindFirstValue("name"),
+            //    Email =
+            //        user.FindFirstValue(ClaimTypes.Email)
+            //        ?? user.FindFirstValue("preferred_username"),
+
+            //    // Authorization info
+            //    Scopes = user.FindFirstValue("scp")?.Split(' '),
+
+            //    // Raw claims (çok faydal? debug için)
+            //    Claims = user.Claims.Select(c => new
+            //    {
+            //        c.Type,
+            //        c.Value
+            //    })
+            //};
+
+            //return Ok(response);
+            var user = await _currentUserService.GetCurrentUserAsync();
+            return Ok(new
             {
-                // Core identity
-                ObjectId = user.FindFirstValue("oid"),
-                TenantId = user.FindFirstValue("tid"),
-                UserPrincipalName = user.FindFirstValue("preferred_username"),
-                Name = user.FindFirstValue("name"),
-                Email =
-                    user.FindFirstValue(ClaimTypes.Email)
-                    ?? user.FindFirstValue("preferred_username"),
+                user.Id,
+                user.DisplayName,
+                user.Email,
+                user.CreatedAt,
+                user.EntraObjectId
 
-                // Authorization info
-                Scopes = user.FindFirstValue("scp")?.Split(' '),
 
-                // Raw claims (çok faydal? debug için)
-                Claims = user.Claims.Select(c => new
-                {
-                    c.Type,
-                    c.Value
-                })
-            };
+            });
 
-            return Ok(response);
         }
 
     }

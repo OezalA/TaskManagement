@@ -3,8 +3,10 @@ namespace TaskManagement.Domain.Entities
 {
     public class User : BaseEntity
     {
-        public string UserName { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
+        public string FirstName { get; set; } = null!;
+        public string LastName { get; set; } = null!;
+        public string DisplayName { get; set; } = null!;
+        public string? Email { get; set; }
 
         // Entra ID mapping
         public string EntraObjectId { get; set; } = string.Empty;

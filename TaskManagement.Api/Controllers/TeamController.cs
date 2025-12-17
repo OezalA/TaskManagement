@@ -92,7 +92,7 @@ namespace TaskManagement.Api.Controllers
             var response = members.Select(m => new TeamMemberResponse
             {
                 UserId = m.UserId,
-                UserName = m.User?.UserName
+                UserName = m.User?.DisplayName
             });
 
             return Ok(response);

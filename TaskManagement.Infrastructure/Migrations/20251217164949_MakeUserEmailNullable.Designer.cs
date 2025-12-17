@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TaskManagement.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using TaskManagement.Infrastructure.Persistence;
 namespace TaskManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251217164949_MakeUserEmailNullable")]
+    partial class MakeUserEmailNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -136,10 +139,6 @@ namespace TaskManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("DisplayName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Email")
                         .HasColumnType("text");
 
@@ -147,11 +146,7 @@ namespace TaskManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("LastName")
+                    b.Property<string>("UserName")
                         .IsRequired()
                         .HasColumnType("text");
 
