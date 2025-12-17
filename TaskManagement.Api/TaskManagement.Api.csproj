@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <InvariantGlobalization>true</InvariantGlobalization>
+	  <AssemblyName>TaskManagement.Api</AssemblyName>
+	  <RootNamespace>TaskManagement.Api</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
