@@ -7,6 +7,7 @@ using TaskManagement.Infrastructure.Services;
 
 namespace TaskManagement.Api.Controllers
 {
+    [Authorize(Policy = "ApiAccess")]
     [ApiController]
     [Route("api/tasks")]
     public class TaskController : ControllerBase
@@ -16,7 +17,7 @@ namespace TaskManagement.Api.Controllers
         {
             _taskService = taskService;
         }
-        [Authorize]
+
         [Authorize(Roles = "Admin,User")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateTaskRequest request)
@@ -39,7 +40,6 @@ namespace TaskManagement.Api.Controllers
                 createdTask
             );
         }
-        [Authorize]
         [Authorize(Roles = "Admin,User")]
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById(Guid id)
@@ -54,7 +54,6 @@ namespace TaskManagement.Api.Controllers
             var tasks = await _taskService.GetByProjectAsync(projectId);
             return Ok(tasks);
         }
-        [Authorize]
         [Authorize(Roles = "Admin,User")]
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> Update(Guid id, TaskItem task)
@@ -65,7 +64,6 @@ namespace TaskManagement.Api.Controllers
             await _taskService.UpdateAsync(task);
             return NoContent();
         }
-        [Authorize]
         [Authorize(Roles = "Admin")]
         [Authorize(Policy = "ApiAccess")]
         [HttpPatch("{id:guid}")]
@@ -88,7 +86,6 @@ namespace TaskManagement.Api.Controllers
             return NoContent();
         }
 
-        [Authorize]
         [Authorize(Roles = "Admin,User")]
         [HttpPut("{id:guid}/assign/{userId:guid}")]
         public async Task<IActionResult> AssignUser(Guid id, Guid userId)
@@ -96,7 +93,6 @@ namespace TaskManagement.Api.Controllers
             await _taskService.AssignUserAsync(id, userId);
             return NoContent();
         }
-        [Authorize]
         [Authorize(Roles = "Admin,User")]
         [HttpPut("{id:guid}/done")]
         public async Task<IActionResult> MarkAsDone(Guid id)
@@ -104,7 +100,6 @@ namespace TaskManagement.Api.Controllers
             await _taskService.MarkAsDoneAsync(id);
             return NoContent();
         }
-        [Authorize]
         [Authorize(Roles = "Admin,User")]
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)

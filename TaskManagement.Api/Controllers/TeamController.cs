@@ -7,6 +7,7 @@ using TaskManagement.Domain.Entities;
 
 namespace TaskManagement.Api.Controllers
 {
+    [Authorize(Policy = "ApiAccess")]
     [ApiController]
     [Route("api/teams")]
     public class TeamController : ControllerBase

@@ -6,6 +6,7 @@ using TaskManagement.Domain.Entities;
 
 namespace TaskManagement.Api.Controllers
 {
+    [Authorize(Policy = "ApiAccess")]
     [ApiController]
     [Route("api/projects")]
     public class ProjectController : ControllerBase

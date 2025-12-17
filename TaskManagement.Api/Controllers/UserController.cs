@@ -6,6 +6,7 @@ using TaskManagement.Application.Interfaces;
 
 namespace TaskManagement.Api.Controllers
 {
+    [Authorize(Policy = "ApiAccess")]
     [ApiController]
     [Route("api/users")]
     public class UserController : ControllerBase
@@ -19,7 +20,6 @@ namespace TaskManagement.Api.Controllers
             _currentUserService = currentUserService;
         }
 
-        [Authorize]
         [HttpGet("secure-test")]
         public IActionResult SecureTest()
         {
@@ -66,7 +66,6 @@ namespace TaskManagement.Api.Controllers
 
         
 
-        [Authorize]
         [HttpGet("me")]
         public async Task<IActionResult> GetMyUser()
         {
