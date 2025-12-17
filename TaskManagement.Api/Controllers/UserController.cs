@@ -69,31 +69,7 @@ namespace TaskManagement.Api.Controllers
         [HttpGet("me")]
         public async Task<IActionResult> GetMyUser()
         {
-            //var user = HttpContext.User;
-
-            //var response = new
-            //{
-            //    // Core identity
-            //    ObjectId = user.FindFirstValue("oid"),
-            //    TenantId = user.FindFirstValue("tid"),
-            //    UserPrincipalName = user.FindFirstValue("preferred_username"),
-            //    Name = user.FindFirstValue("name"),
-            //    Email =
-            //        user.FindFirstValue(ClaimTypes.Email)
-            //        ?? user.FindFirstValue("preferred_username"),
-
-            //    // Authorization info
-            //    Scopes = user.FindFirstValue("scp")?.Split(' '),
-
-            //    // Raw claims (çok faydal? debug için)
-            //    Claims = user.Claims.Select(c => new
-            //    {
-            //        c.Type,
-            //        c.Value
-            //    })
-            //};
-
-            //return Ok(response);
+            
             var user = await _currentUserService.GetCurrentUserAsync();
             return Ok(new
             {
@@ -106,6 +82,12 @@ namespace TaskManagement.Api.Controllers
 
             });
 
+        }
+        // Test
+        [HttpGet("debug/claims")]
+        public IActionResult GetClaims()
+        {
+            return Ok(User.Claims.Select(c => new { c.Type, c.Value }));
         }
 
     }

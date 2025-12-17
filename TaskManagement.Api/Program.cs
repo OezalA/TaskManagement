@@ -19,7 +19,11 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("ApiAccess", policy =>
     {
-        policy.RequireClaim("scp", "access_api");
+        policy.RequireAssertion(context =>
+            context.User.Claims.Any(c =>
+                (c.Type == "scp" ||
+                 c.Type == "http://schemas.microsoft.com/identity/claims/scope")
+                && c.Value.Contains("access_api")));
     });
 });
 
