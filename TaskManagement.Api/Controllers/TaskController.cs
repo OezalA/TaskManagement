@@ -14,12 +14,14 @@ namespace TaskManagement.Api.Controllers
     {
         private readonly ITaskService _taskService;
         private readonly IWorkLogService _workLogService;
+        private readonly IWorkLogQueryService _workLogQueryService;
         private readonly ICurrentUserService _currentUserService;
 
-        public TaskController(ITaskService taskService, IWorkLogService workLogService, ICurrentUserService currentUserService)
+        public TaskController(ITaskService taskService, IWorkLogService workLogService, IWorkLogQueryService workLogQueryService, ICurrentUserService currentUserService)
         {
             _taskService = taskService;
             _workLogService = workLogService;
+            _workLogQueryService = workLogQueryService;
             _currentUserService = currentUserService;
         }
 
@@ -143,6 +145,49 @@ namespace TaskManagement.Api.Controllers
                 return NotFound("No active work log found");
 
             return Ok(workLog);
+        }
+
+        // Query endpoints for time tracking
+        [Authorize(Roles = "Admin,User")]
+        [HttpGet("this-week")]
+        public async Task<IActionResult> GetThisWeekTasks()
+        {
+            var currentUser = await _currentUserService.GetCurrentUserAsync();
+            var weeklyTasks = await _workLogQueryService.GetThisWeekTasksAsync(currentUser.Id);
+            return Ok(weeklyTasks);
+        }
+
+        [Authorize(Roles = "Admin,User")]
+        [HttpGet("{id:guid}/total-time")]
+        public async Task<IActionResult> GetTaskTotalTime(Guid id)
+        {
+            var currentUser = await _currentUserService.GetCurrentUserAsync();
+            var taskTime = await _workLogQueryService.GetTaskTotalTimeAsync(id, currentUser.Id);
+            
+            if (taskTime == null)
+                return NotFound("No work logs found for this task");
+
+            return Ok(taskTime);
+        }
+
+        [Authorize(Roles = "Admin,User")]
+        [HttpGet("{id:guid}/work-logs")]
+        public async Task<IActionResult> GetTaskWorkLogs(Guid id)
+        {
+            var workLogs = await _workLogQueryService.GetTaskWorkLogsAsync(id);
+            return Ok(workLogs);
+        }
+
+        [Authorize(Roles = "Admin,User")]
+        [HttpGet("{id:guid}/total-time-all-users")]
+        public async Task<IActionResult> GetTaskTotalTimeAllUsers(Guid id)
+        {
+            var taskTime = await _workLogQueryService.GetTaskTotalTimeAllUsersAsync(id);
+            
+            if (taskTime == null)
+                return NotFound("No work logs found for this task");
+
+            return Ok(taskTime);
         }
     }
 }

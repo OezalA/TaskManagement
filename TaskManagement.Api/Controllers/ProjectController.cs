@@ -12,10 +12,14 @@ namespace TaskManagement.Api.Controllers
     public class ProjectController : ControllerBase
     {
         private readonly IProjectService _projectService;
+        private readonly IWorkLogQueryService _workLogQueryService;
+        private readonly ICurrentUserService _currentUserService;
 
-        public ProjectController(IProjectService projectService)
+        public ProjectController(IProjectService projectService, IWorkLogQueryService workLogQueryService, ICurrentUserService currentUserService)
         {
             _projectService = projectService;
+            _workLogQueryService = workLogQueryService;
+            _currentUserService = currentUserService;
         }
 
         [HttpPost]
@@ -65,6 +69,32 @@ namespace TaskManagement.Api.Controllers
         {
             await _projectService.DeleteAsync(id);
             return NoContent();
+        }
+
+        // Time tracking endpoints
+        [Authorize(Roles = "Admin,User")]
+        [HttpGet("{id:guid}/total-time")]
+        public async Task<IActionResult> GetProjectTotalTime(Guid id)
+        {
+            var currentUser = await _currentUserService.GetCurrentUserAsync();
+            var projectTime = await _workLogQueryService.GetProjectTotalTimeAsync(id, currentUser.Id);
+            
+            if (projectTime == null)
+                return NotFound("No work logs found for this project");
+
+            return Ok(projectTime);
+        }
+
+        [Authorize(Roles = "Admin,User")]
+        [HttpGet("{id:guid}/total-time-all-users")]
+        public async Task<IActionResult> GetProjectTotalTimeAllUsers(Guid id)
+        {
+            var projectTime = await _workLogQueryService.GetProjectTotalTimeAllUsersAsync(id);
+            
+            if (projectTime == null)
+                return NotFound("No work logs found for this project");
+
+            return Ok(projectTime);
         }
     }
 }

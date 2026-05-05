@@ -161,6 +161,17 @@ namespace TaskManagement.Infrastructure.Services
                     "TaskAlreadyCompleted"
                 );
 
+            // Rule: Cannot complete if there's an active worklog
+            var activeWorkLog = await _dbContext.WorkLogs
+                .AnyAsync(wl => wl.TaskId == taskId && wl.EndTime == null);
+
+            if (activeWorkLog)
+                throw new ConflictException(
+                    "Cannot complete task while work is still in progress. " +
+                    "Stop the active worklog first.",
+                    "ActiveWorkLogExists"
+                );
+
             task.Status = TaskItemStatus.Done;
             task.DueDate = DateTime.UtcNow; 
             await _dbContext.SaveChangesAsync();
