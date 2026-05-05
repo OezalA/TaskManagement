@@ -1,0 +1,65 @@
+?u anda sistemin ?unlar? sa?lam ?ekilde yapabiliyor:
+
+? Kimlik do?rulama (Entra ID)
+? Yetkilendirme (scope-based, MCP uyumlu)
+? User ? Domain User e?le?tirmesi
+? Project / Task / Team yönetimi
+? PATCH + Command endpoint’ler
+? Task assign / complete / reopen
+
+Yani sistem art?k:
+
+“Kim, ne yapt??”
+sorusunu cevaplayabiliyor.
+
+Ama henüz ?unu cevaplayam?yor:
+
+“Kim, ne kadar süre ne üzerinde çal??t??”
+
+?? SIRADAK? IMPLEMENTATION: A?AMA 12 – TIME TRACKING
+Temel fikir
+
+Bir user:
+
+Bir task üzerinde çal??maya ba?lar
+Bir süre sonra b?rak?r
+Bu süre sistemde kaydedilir
+A?ama 12’de ne yapaca??z? (yüksek seviye)
+12.1 — Yeni domain kavram?: WorkLog
+User
+Task
+StartTime
+EndTime
+Duration (hesaplanabilir)
+12.2 — Command endpoint’ler
+POST /tasks/{id}/start-work
+POST /tasks/{id}/stop-work
+12.3 — ?? kurallar?
+Ayn? anda iki task’ta çal??amaz
+Bitmemi? worklog varken yeni ba?lanamaz
+Stop edilmeden complete edilemez (opsiyonel kural)
+12.4 — Query endpoint’ler
+Bu hafta çal??t???m task’lar
+Bir task’a harcanan toplam süre
+Bir projeye harcanan toplam süre
+Neden bu ad?m ?imdi do?ru?
+PATCH & Command altyap?s? haz?r
+CurrentUserService haz?r
+MCP için en de?erli veri zaman verisi
+Gerçek hayata en yak?n feature bu
+MCP ile ba?lant?s? (çok önemli)
+
+MCP taraf?nda ?u sorular do?rudan mümkün olur:
+
+“Bu hafta ne üzerinde çal??t?m?”
+“X projesine toplam kaç saat harcand??”
+“Bugün aktif oldu?um task neydi?”
+
+Bunlar LLM’in güçlü oldu?u sorular.
+
+Alternatif ne olurdu?
+MCP’ye geçmek ? erken
+Reporting ? zaman verisi olmadan anlams?z
+Role/permission detaylar? ? ?u an dü?ük de?er
+
+Bu yüzden A?ama 12 en mant?kl? s?radaki ad?md?r.

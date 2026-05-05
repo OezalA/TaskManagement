@@ -16,6 +16,7 @@ public class AppDbContext : DbContext
     public DbSet<TaskItem> TaskItems => Set<TaskItem>();
     public DbSet<Team> Teams => Set<Team>();
     public DbSet<TeamUser> TeamUsers => Set<TeamUser>();
+    public DbSet<WorkLog> WorkLogs => Set<WorkLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -47,6 +48,20 @@ public class AppDbContext : DbContext
             .WithMany() 
             .HasForeignKey(t => t.AssignedUserId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        // WorkLog -> User (many-to-one)
+        modelBuilder.Entity<WorkLog>()
+            .HasOne(wl => wl.User)
+            .WithMany(u => u.WorkLogs)
+            .HasForeignKey(wl => wl.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // WorkLog -> TaskItem (many-to-one)
+        modelBuilder.Entity<WorkLog>()
+            .HasOne(wl => wl.Task)
+            .WithMany(t => t.WorkLogs)
+            .HasForeignKey(wl => wl.TaskId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 
 }

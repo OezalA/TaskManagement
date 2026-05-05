@@ -13,9 +13,14 @@ namespace TaskManagement.Api.Controllers
     public class TaskController : ControllerBase
     {
         private readonly ITaskService _taskService;
-        public TaskController(ITaskService taskService)
+        private readonly IWorkLogService _workLogService;
+        private readonly ICurrentUserService _currentUserService;
+
+        public TaskController(ITaskService taskService, IWorkLogService workLogService, ICurrentUserService currentUserService)
         {
             _taskService = taskService;
+            _workLogService = workLogService;
+            _currentUserService = currentUserService;
         }
 
         [Authorize(Roles = "Admin,User")]
@@ -106,6 +111,38 @@ namespace TaskManagement.Api.Controllers
         {
             await _taskService.DeleteAsync(id);
             return NoContent();
+        }
+
+        // WorkLog endpoints
+        [Authorize(Roles = "Admin,User")]
+        [HttpPost("{id:guid}/start-work")]
+        public async Task<IActionResult> StartWork(Guid id, [FromBody] StartWorkRequest request)
+        {
+            var currentUser = await _currentUserService.GetCurrentUserAsync();
+            var workLog = await _workLogService.StartWorkAsync(id, currentUser.Id);
+            return CreatedAtAction(nameof(StartWork), new { id }, workLog);
+        }
+
+        [Authorize(Roles = "Admin,User")]
+        [HttpPost("{id:guid}/stop-work")]
+        public async Task<IActionResult> StopWork(Guid id, [FromBody] StopWorkRequest request)
+        {
+            var currentUser = await _currentUserService.GetCurrentUserAsync();
+            var workLog = await _workLogService.StopWorkAsync(id, currentUser.Id);
+            return Ok(workLog);
+        }
+
+        [Authorize(Roles = "Admin,User")]
+        [HttpGet("active-work")]
+        public async Task<IActionResult> GetActiveWork()
+        {
+            var currentUser = await _currentUserService.GetCurrentUserAsync();
+            var workLog = await _workLogService.GetActiveWorkLogAsync(currentUser.Id);
+            
+            if (workLog == null)
+                return NotFound("No active work log found");
+
+            return Ok(workLog);
         }
     }
 }

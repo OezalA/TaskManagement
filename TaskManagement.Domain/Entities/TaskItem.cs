@@ -16,7 +16,8 @@ namespace TaskManagement.Domain.Entities
         public Guid ProjectId { get; set; }
         public Project Project { get; set; } = default!;
 
-        
+        // Navigation - WorkLogs
+        public ICollection<WorkLog> WorkLogs { get; set; } = new List<WorkLog>();
     }
 
     

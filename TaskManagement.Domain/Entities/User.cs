@@ -14,5 +14,6 @@ namespace TaskManagement.Domain.Entities
         // Navigation
         public ICollection<TaskItem> AssignedTasks { get; set; } = new List<TaskItem>();
         public ICollection<TeamUser> Teams { get; set; } = new List<TeamUser>();
+        public ICollection<WorkLog> WorkLogs { get; set; } = new List<WorkLog>();
     }
 }
