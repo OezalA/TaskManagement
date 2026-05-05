@@ -13,11 +13,13 @@ namespace TaskManagement.Api.Controllers
     {
         private readonly IUserService _userService;
         private readonly ICurrentUserService _currentUserService;
+        private readonly IWorkLogQueryService _workLogQueryService;
 
-        public UserController(IUserService userService, ICurrentUserService currentUserService)
+        public UserController(IUserService userService, ICurrentUserService currentUserService, IWorkLogQueryService workLogQueryService)
         {
             _userService = userService;
             _currentUserService = currentUserService;
+            _workLogQueryService = workLogQueryService;
         }
 
         [HttpGet("secure-test")]
@@ -88,6 +90,22 @@ namespace TaskManagement.Api.Controllers
         public IActionResult GetClaims()
         {
             return Ok(User.Claims.Select(c => new { c.Type, c.Value }));
+        }
+
+        // Work Log Reporting
+        [Authorize(Roles = "Admin,User")]
+        [HttpGet("{userId:guid}/worklogs")]
+        public async Task<IActionResult> GetUserWorkLogs(Guid userId, [FromQuery] string? week = null)
+        {
+            var workLogs = await _workLogQueryService.GetUserWorkLogsAsync(userId, week);
+            return Ok(new
+            {
+                userId,
+                week = week ?? "all",
+                count = workLogs.Count,
+                totalMinutes = workLogs.Sum(wl => wl.DurationMinutes ?? 0),
+                workLogs
+            });
         }
 
     }

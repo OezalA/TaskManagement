@@ -42,6 +42,52 @@ namespace TaskManagement.Infrastructure.Services
             return weeklyTasks;
         }
 
+        public async Task<List<WorkLogDto>> GetUserWorkLogsAsync(Guid userId, string? week = null)
+        {
+            var query = _dbContext.WorkLogs
+                .Where(wl => wl.UserId == userId);
+
+            // Apply week filter if provided
+            if (!string.IsNullOrEmpty(week))
+            {
+                var today = DateTime.UtcNow;
+                DateTime rangeStart, rangeEnd;
+
+                switch (week.ToLower())
+                {
+                    case "this":
+                        rangeStart = today.AddDays(-(int)today.DayOfWeek);
+                        rangeEnd = rangeStart.AddDays(7);
+                        break;
+                    case "last":
+                        var lastWeekEnd = today.AddDays(-(int)today.DayOfWeek);
+                        rangeStart = lastWeekEnd.AddDays(-7);
+                        rangeEnd = lastWeekEnd;
+                        break;
+                    default:
+                        throw new ArgumentException($"Invalid week filter: {week}. Use 'this', 'last', or omit for 'all'");
+                }
+
+                query = query.Where(wl => wl.StartTime >= rangeStart && wl.StartTime < rangeEnd);
+            }
+
+            var workLogs = await query
+                .OrderByDescending(wl => wl.StartTime)
+                .Select(wl => new WorkLogDto
+                {
+                    Id = wl.Id,
+                    UserId = wl.UserId,
+                    TaskId = wl.TaskId,
+                    StartTime = wl.StartTime,
+                    EndTime = wl.EndTime,
+                    DurationMinutes = wl.DurationMinutes,
+                    CreatedAt = wl.CreatedAt
+                })
+                .ToListAsync();
+
+            return workLogs;
+        }
+
         public async Task<TaskTimeDto?> GetTaskTotalTimeAsync(Guid taskId, Guid userId)
         {
             var result = await _dbContext.WorkLogs

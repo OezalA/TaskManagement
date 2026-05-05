@@ -10,6 +10,12 @@ namespace TaskManagement.Application.Interfaces
         Task<List<WeeklyTaskDto>> GetThisWeekTasksAsync(Guid userId);
 
         /// <summary>
+        /// Gets work logs for a user with optional week filter.
+        /// Week values: "this", "last", or "all"
+        /// </summary>
+        Task<List<WorkLogDto>> GetUserWorkLogsAsync(Guid userId, string? week = null);
+
+        /// <summary>
         /// Gets total time spent on a specific task by the user.
         /// </summary>
         Task<TaskTimeDto?> GetTaskTotalTimeAsync(Guid taskId, Guid userId);
