@@ -1,0 +1,133 @@
+{
+  "version": "0.1.0",
+  "name": "TaskManagement.MCP",
+  "description": "MCP Server for Task Management API",
+  "tools": [
+    {
+      "name": "get_user_weekly_tasks",
+      "description": "Get tasks a user worked on this week with time tracking",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "description": "The UUID of the user"
+          },
+          "week": {
+            "type": "string",
+            "enum": ["this", "last"],
+            "description": "Which week to query: 'this' for current week, 'last' for previous week",
+            "default": "this"
+          }
+        },
+        "required": ["user_id"]
+      }
+    },
+    {
+      "name": "get_user_work_logs",
+      "description": "Get detailed work logs for a user with optional week filter",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "description": "The UUID of the user"
+          },
+          "week": {
+            "type": "string",
+            "enum": ["this", "last", "all"],
+            "description": "Filter by week: 'this', 'last', or 'all'",
+            "default": "all"
+          }
+        },
+        "required": ["user_id"]
+      }
+    },
+    {
+      "name": "get_task_time_spent",
+      "description": "Get total time spent on a specific task",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "description": "The UUID of the task"
+          },
+          "user_id": {
+            "type": "string",
+            "description": "The UUID of the user (optional, if omitted gets total for all users)"
+          }
+        },
+        "required": ["task_id"]
+      }
+    },
+    {
+      "name": "get_project_time_spent",
+      "description": "Get total time spent on a project",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "description": "The UUID of the project"
+          },
+          "user_id": {
+            "type": "string",
+            "description": "The UUID of the user (optional, if omitted gets total for all users)"
+          }
+        },
+        "required": ["project_id"]
+      }
+    },
+    {
+      "name": "get_user_active_work",
+      "description": "Get the current active work log for a user",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "description": "The UUID of the user"
+          }
+        },
+        "required": ["user_id"]
+      }
+    },
+    {
+      "name": "start_task_work",
+      "description": "Start work on a task",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "description": "The UUID of the task"
+          },
+          "user_id": {
+            "type": "string",
+            "description": "The UUID of the user starting the work"
+          }
+        },
+        "required": ["task_id", "user_id"]
+      }
+    },
+    {
+      "name": "stop_task_work",
+      "description": "Stop work on a task",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "description": "The UUID of the task"
+          },
+          "user_id": {
+            "type": "string",
+            "description": "The UUID of the user stopping the work"
+          }
+        },
+        "required": ["task_id", "user_id"]
+      }
+    }
+  ]
+}

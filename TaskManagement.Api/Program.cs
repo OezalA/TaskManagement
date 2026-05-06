@@ -6,6 +6,7 @@ using TaskManagement.Api.Middleware;
 using TaskManagement.Application.Interfaces;
 using TaskManagement.Infrastructure.Persistence;
 using TaskManagement.Infrastructure.Services;
+using TaskManagement.MCP;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +43,20 @@ builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IWorkLogService, WorkLogService>();
 builder.Services.AddScoped<IWorkLogQueryService, WorkLogQueryService>();
 builder.Services.AddHttpContextAccessor();
+
+// MCP Integration
+builder.Services.AddHttpClient<MCPToolHandler>((provider, client) =>
+{
+    var apiBaseUrl = builder.Configuration["MCPSettings:ApiBaseUrl"] ?? "http://localhost:5253";
+    client.BaseAddress = new Uri(apiBaseUrl);
+});
+builder.Services.AddScoped(sp =>
+{
+    var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+    var httpClient = httpClientFactory.CreateClient();
+    var apiBaseUrl = builder.Configuration["MCPSettings:ApiBaseUrl"] ?? "http://localhost:5253";
+    return new MCPToolHandler(httpClient, apiBaseUrl);
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

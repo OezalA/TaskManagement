@@ -4,3 +4,51 @@ GET {{TaskManagement.Api_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+# MCP - Get available tools
+GET {{TaskManagement.Api_HostAddress}}/api/mcp/tools
+Accept: application/json
+
+###
+
+# MCP - Execute tool: get_user_weekly_tasks
+POST {{TaskManagement.Api_HostAddress}}/api/mcp/execute
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN
+
+{
+  "toolName": "get_user_weekly_tasks",
+  "parameters": {
+    "user_id": "user-123",
+    "week": "this"
+  }
+}
+
+###
+
+# MCP - Execute tool: get_user_work_logs
+POST {{TaskManagement.Api_HostAddress}}/api/mcp/execute
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN
+
+{
+  "toolName": "get_user_work_logs",
+  "parameters": {
+    "user_id": "user-123",
+    "week": "all"
+  }
+}
+
+###
+
+# MCP - Natural language query: "Hans bu hafta ne yapti?"
+POST {{TaskManagement.Api_HostAddress}}/api/mcp/query
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN
+
+{
+  "text": "What did user-123 do this week?",
+  "userId": "user-123"
+}
+
+###

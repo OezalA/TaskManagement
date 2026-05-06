@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagement.Infrastructu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagement.Api", "TaskManagement.Api\TaskManagement.Api.csproj", "{622A953B-FE80-45D3-B076-62A4CD2FA6A4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagement.MCP", "TaskManagement.MCP\TaskManagement.MCP.csproj", "{D1E3F5A9-8E9D-4A2B-9C1F-7A3B5E8D6F4C}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projektmappenelemente", "Projektmappenelemente", "{84D27F74-D2BA-6C25-2661-968F101900D9}"
 	ProjectSection(SolutionItems) = preProject
 		ToDo.txt = ToDo.txt
@@ -75,6 +77,18 @@ Global
 		{622A953B-FE80-45D3-B076-62A4CD2FA6A4}.Release|x64.Build.0 = Release|Any CPU
 		{622A953B-FE80-45D3-B076-62A4CD2FA6A4}.Release|x86.ActiveCfg = Release|Any CPU
 		{622A953B-FE80-45D3-B076-62A4CD2FA6A4}.Release|x86.Build.0 = Release|Any CPU
+		{D1E3F5A9-8E9D-4A2B-9C1F-7A3B5E8D6F4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1E3F5A9-8E9D-4A2B-9C1F-7A3B5E8D6F4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1E3F5A9-8E9D-4A2B-9C1F-7A3B5E8D6F4C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D1E3F5A9-8E9D-4A2B-9C1F-7A3B5E8D6F4C}.Debug|x64.Build.0 = Debug|Any CPU
+		{D1E3F5A9-8E9D-4A2B-9C1F-7A3B5E8D6F4C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D1E3F5A9-8E9D-4A2B-9C1F-7A3B5E8D6F4C}.Debug|x86.Build.0 = Debug|Any CPU
+		{D1E3F5A9-8E9D-4A2B-9C1F-7A3B5E8D6F4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1E3F5A9-8E9D-4A2B-9C1F-7A3B5E8D6F4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1E3F5A9-8E9D-4A2B-9C1F-7A3B5E8D6F4C}.Release|x64.ActiveCfg = Release|Any CPU
+		{D1E3F5A9-8E9D-4A2B-9C1F-7A3B5E8D6F4C}.Release|x64.Build.0 = Release|Any CPU
+		{D1E3F5A9-8E9D-4A2B-9C1F-7A3B5E8D6F4C}.Release|x86.ActiveCfg = Release|Any CPU
+		{D1E3F5A9-8E9D-4A2B-9C1F-7A3B5E8D6F4C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
