@@ -42,6 +42,7 @@ builder.Services.AddScoped<ITeamService, TeamService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IWorkLogService, WorkLogService>();
 builder.Services.AddScoped<IWorkLogQueryService, WorkLogQueryService>();
+builder.Services.AddScoped<IUserResolutionService, UserResolutionService>();
 builder.Services.AddHttpContextAccessor();
 
 // MCP Integration

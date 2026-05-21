@@ -41,14 +41,66 @@ Authorization: Bearer YOUR_JWT_TOKEN
 
 ###
 
-# MCP - Natural language query: "Hans bu hafta ne yapti?"
+# NLP Query - "Hans bu hafta ne yapti?" (What did Hans do this week?)
 POST {{TaskManagement.Api_HostAddress}}/api/mcp/query
 Content-Type: application/json
 Authorization: Bearer YOUR_JWT_TOKEN
 
 {
-  "text": "What did user-123 do this week?",
-  "userId": "user-123"
+  "text": "Hans bu hafta ne yapti?"
 }
+
+###
+
+# NLP Query - "What did John do last week?"
+POST {{TaskManagement.Api_HostAddress}}/api/mcp/query
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN
+
+{
+  "text": "What did John do last week?"
+}
+
+###
+
+# NLP Query - "Show Hans's work logs"
+POST {{TaskManagement.Api_HostAddress}}/api/mcp/query
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN
+
+{
+  "text": "Show Hans's work logs"
+}
+
+###
+
+# NLP Query - "How much time on ProjectX?"
+POST {{TaskManagement.Api_HostAddress}}/api/mcp/query
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN
+
+{
+  "text": "How much time spent on ProjectX?"
+}
+
+###
+
+# NLP Query - "What is John working on?"
+POST {{TaskManagement.Api_HostAddress}}/api/mcp/query
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN
+
+{
+  "text": "What is John working on?"
+}
+
+###
+
+# NLP Query - Auto-detect current user
+POST {{TaskManagement.Api_HostAddress}}/api/mcp/query-auto
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN
+
+"What did I do this week?"
 
 ###
