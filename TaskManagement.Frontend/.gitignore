@@ -18,7 +18,7 @@ src/environments/environment.prod.ts
 .env.local
 
 # Dependencies
-package-lock.json
+
 yarn.lock
 
 # Build outputs
