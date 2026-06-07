@@ -33,7 +33,7 @@ export class ProjectListComponent implements OnInit {
     this.loading = true;
     this.projectService.getProjects().subscribe({
       next: (p: any[]) => { this.projects = p; this.loading = false; },
-      error: () => { this.error = 'Failed to load projects'; this.loading = false; }
+      error: () => { this.error = 'Projekte konnten nicht geladen werden'; this.loading = false; }
     });
   }
 
@@ -80,6 +80,6 @@ export class ProjectListComponent implements OnInit {
   }
 
   formatDate(d: string): string {
-    return new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    return new Date(d).toLocaleDateString('de-DE', { year: 'numeric', month: 'short', day: 'numeric' });
   }
 }

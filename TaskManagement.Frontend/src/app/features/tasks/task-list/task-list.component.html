@@ -1,21 +1,21 @@
 <div class="page">
   <div class="page-header">
     <div>
-      <div class="page-title">Tasks</div>
+      <div class="page-title">Aufgaben</div>
       <div class="page-subtitle" *ngIf="selectedProject()">{{ selectedProject()?.name }}</div>
     </div>
     <div class="header-controls">
       <select class="form-control" [(ngModel)]="statusFilter" style="width:150px">
-        <option value="">All statuses</option>
-        <option [ngValue]="0">Todo</option>
-        <option [ngValue]="1">In Progress</option>
-        <option [ngValue]="2">Done</option>
+        <option value="">Alle Status</option>
+        <option [ngValue]="0">Zu erledigen</option>
+        <option [ngValue]="1">In Bearbeitung</option>
+        <option [ngValue]="2">Erledigt</option>
       </select>
       <select class="form-control" [(ngModel)]="selectedProjectId" (change)="loadTasks()" style="width:200px">
         <option *ngFor="let p of projects" [value]="p.id">{{ p.name }}</option>
       </select>
       <a *ngIf="selectedProjectId" [routerLink]="['/projects', selectedProjectId]" class="btn btn-primary">
-        Open Board
+        Board öffnen
       </a>
     </div>
   </div>
@@ -23,33 +23,33 @@
   <div *ngIf="error" class="alert alert-error">{{ error }}</div>
 
   <div *ngIf="loading" class="loading-center">
-    <div class="spinner"></div> Loading tasks...
+    <div class="spinner"></div> Aufgaben werden geladen...
   </div>
 
   <div *ngIf="!loading && projects.length === 0" class="empty">
     <div class="empty-icon">📁</div>
-    <div class="empty-title">No projects found</div>
-    <div class="empty-text">Create a project first to manage tasks</div>
-    <a routerLink="/projects" class="btn btn-primary">Go to Projects</a>
+    <div class="empty-title">Keine Projekte gefunden</div>
+    <div class="empty-text">Erstellen Sie zuerst ein Projekt, um Aufgaben zu verwalten</div>
+    <a routerLink="/projects" class="btn btn-primary">Zu den Projekten</a>
   </div>
 
   <div *ngIf="!loading && projects.length > 0">
     <div *ngIf="filteredTasks.length === 0" class="empty">
       <div class="empty-icon">✅</div>
-      <div class="empty-title">No tasks found</div>
-      <div class="empty-text">Add tasks from the project board</div>
-      <a [routerLink]="['/projects', selectedProjectId]" class="btn btn-primary">Open Board</a>
+      <div class="empty-title">Keine Aufgaben gefunden</div>
+      <div class="empty-text">Fügen Sie Aufgaben über das Projekt-Board hinzu</div>
+      <a [routerLink]="['/projects', selectedProjectId]" class="btn btn-primary">Board öffnen</a>
     </div>
 
     <div *ngIf="filteredTasks.length > 0" class="card">
       <table class="table">
         <thead>
           <tr>
-            <th>Task</th>
+            <th>Aufgabe</th>
             <th>Status</th>
-            <th>Assigned To</th>
-            <th>Due Date</th>
-            <th>Actions</th>
+            <th>Zugewiesen an</th>
+            <th>Fälligkeitsdatum</th>
+            <th>Aktionen</th>
           </tr>
         </thead>
         <tbody>
@@ -77,10 +77,10 @@
               <div class="flex gap-2">
                 <button *ngIf="statusNum(t.status) < 2" class="btn btn-secondary btn-sm"
                         (click)="setStatus(t, statusNum(t.status) + 1)">
-                  {{ statusNum(t.status) === 0 ? '→ Start' : '→ Done' }}
+                  {{ statusNum(t.status) === 0 ? '→ Starten' : '→ Erledigt' }}
                 </button>
                 <button *ngIf="statusNum(t.status) === 2" class="btn btn-secondary btn-sm"
-                        (click)="setStatus(t, 1)">↩ Reopen</button>
+                        (click)="setStatus(t, 1)">↩ Wieder öffnen</button>
                 <button class="btn-icon" (click)="deleteTask(t.id)" style="color:var(--danger)">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="3 6 5 6 21 6"/>

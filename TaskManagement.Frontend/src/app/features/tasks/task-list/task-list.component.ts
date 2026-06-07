@@ -29,7 +29,7 @@ export class TaskListComponent implements OnInit {
   ngOnInit(): void {
     this.projectService.getProjects().subscribe({
       next: (p: any[]) => { this.projects = p; if (p.length > 0) { this.selectedProjectId = p[0].id; this.loadTasks(); } },
-      error: () => { this.error = 'Failed to load projects'; }
+      error: () => { this.error = 'Projekte konnten nicht geladen werden'; }
     });
   }
 
@@ -38,7 +38,7 @@ export class TaskListComponent implements OnInit {
     this.loading = true;
     this.taskService.getByProject(this.selectedProjectId).subscribe({
       next: (t: Task[]) => { this.tasks = t; this.loading = false; },
-      error: () => { this.error = 'Failed to load tasks'; this.loading = false; }
+      error: () => { this.error = 'Aufgaben konnten nicht geladen werden'; this.loading = false; }
     });
   }
 
@@ -54,7 +54,7 @@ export class TaskListComponent implements OnInit {
   }
 
   statusLabel(s: number | string): string {
-    return ['Todo', 'In Progress', 'Done'][this.statusNum(s)] ?? '';
+    return ['Zu erledigen', 'In Bearbeitung', 'Erledigt'][this.statusNum(s)] ?? '';
   }
 
   statusClass(s: number | string): string {
@@ -63,7 +63,7 @@ export class TaskListComponent implements OnInit {
 
   formatDate(d: string): string {
     if (!d) return '';
-    return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return new Date(d).toLocaleDateString('de-DE', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
   isOverdue(d: string): boolean {
@@ -78,7 +78,7 @@ export class TaskListComponent implements OnInit {
   }
 
   deleteTask(id: string): void {
-    if (!confirm('Delete this task?')) return;
+    if (!confirm('Diese Aufgabe löschen?')) return;
     this.taskService.delete(id).subscribe({
       next: () => this.loadTasks(),
       error: () => {}

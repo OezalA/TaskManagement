@@ -101,7 +101,7 @@ export class TimeTrackingComponent implements OnInit, OnDestroy {
   formatTime(minutes: number): string {
     const h = Math.floor(minutes / 60);
     const m = minutes % 60;
-    return h > 0 ? `${h}h ${m}m` : `${m}m`;
+    return h > 0 ? `${h} Std ${m} Min` : `${m} Min`;
   }
 
   totalWeekMinutes(): number {

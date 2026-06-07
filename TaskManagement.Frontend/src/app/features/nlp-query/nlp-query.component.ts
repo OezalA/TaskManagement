@@ -34,32 +34,32 @@ export class NLPQueryComponent implements OnInit {
   tools: { name: string; label: string; params: ToolParam[] }[] = [
     {
       name: 'get_user_work_logs',
-      label: 'User Work Logs',
+      label: 'Arbeitsprotokolle',
       params: [
-        { key: 'user_id', label: 'User', type: 'user', required: true, value: '' },
-        { key: 'week', label: 'Period', type: 'select', required: false, value: 'all', options: ['all', 'this', 'last'] }
+        { key: 'user_id', label: 'Benutzer', type: 'user', required: true, value: '' },
+        { key: 'week', label: 'Zeitraum', type: 'select', required: false, value: 'all', options: ['all', 'this', 'last'] }
       ]
     },
     {
       name: 'get_user_weekly_tasks',
-      label: 'User Weekly Tasks',
+      label: 'Wöchentliche Aufgaben',
       params: [
-        { key: 'user_id', label: 'User', type: 'user', required: true, value: '' },
-        { key: 'week', label: 'Week', type: 'select', required: false, value: 'this', options: ['this', 'last'] }
+        { key: 'user_id', label: 'Benutzer', type: 'user', required: true, value: '' },
+        { key: 'week', label: 'Woche', type: 'select', required: false, value: 'this', options: ['this', 'last'] }
       ]
     },
     {
       name: 'get_user_active_work',
-      label: 'Active Work',
+      label: 'Aktive Arbeit',
       params: [
-        { key: 'user_id', label: 'User', type: 'user', required: true, value: '' }
+        { key: 'user_id', label: 'Benutzer', type: 'user', required: true, value: '' }
       ]
     },
     {
       name: 'get_project_time_spent',
-      label: 'Project Time Spent',
+      label: 'Aufgewendete Projektzeit',
       params: [
-        { key: 'project_id', label: 'Project', type: 'project', required: true, value: '' }
+        { key: 'project_id', label: 'Projekt', type: 'project', required: true, value: '' }
       ]
     }
   ];
@@ -73,10 +73,10 @@ export class NLPQueryComponent implements OnInit {
   history: HistoryEntry[] = [];
 
   chips = [
-    'What did Ahmet do this week?',
-    'Show Mehmet work logs',
-    'What is Ayse working on?',
-    'How much time on Backend?'
+    'Was hat Hans diese Woche gemacht?',
+    'Zeige die Arbeitsprotokolle von Anna',
+    'Woran arbeitet Hans?',
+    'Wie viel Zeit wurde für Backend aufgewendet?'
   ];
 
   constructor(
@@ -119,12 +119,12 @@ export class NLPQueryComponent implements OnInit {
           this.history.unshift({ query: this.query, tool: this.parsedTool, result: this.result, ts: new Date() });
           if (this.history.length > 8) this.history.pop();
         } else {
-          this.error = res.error || 'Could not parse query.';
+          this.error = res.error || 'Abfrage konnte nicht verarbeitet werden.';
         }
       },
       error: err => {
         this.loading = false;
-        this.error = err?.error?.error || err?.message || 'Request failed.';
+        this.error = err?.error?.error || err?.message || 'Anfrage fehlgeschlagen.';
       }
     });
   }
@@ -146,12 +146,12 @@ export class NLPQueryComponent implements OnInit {
           this.history.unshift({ query: `[Tool] ${this.selectedTool.label}`, tool: this.selectedTool.name, result: this.toolResult, ts: new Date() });
           if (this.history.length > 8) this.history.pop();
         } else {
-          this.toolError = res.error || 'Tool execution failed.';
+          this.toolError = res.error || 'Tool-Ausführung fehlgeschlagen.';
         }
       },
       error: err => {
         this.toolLoading = false;
-        this.toolError = err?.error?.error || err?.message || 'Request failed.';
+        this.toolError = err?.error?.error || err?.message || 'Anfrage fehlgeschlagen.';
       }
     });
   }
@@ -179,7 +179,7 @@ export class NLPQueryComponent implements OnInit {
 
   formatTime(d: string): string {
     if (!d) return '';
-    return new Date(d).toLocaleString('tr-TR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+    return new Date(d).toLocaleString('de-DE', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
   }
 
   resultIsWorkLogs(): boolean {

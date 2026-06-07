@@ -69,9 +69,9 @@ export class DashboardComponent implements OnInit {
 
   get greeting(): string {
     const h = new Date().getHours();
-    if (h < 12) return 'Good morning';
-    if (h < 17) return 'Good afternoon';
-    return 'Good evening';
+    if (h < 12) return 'Guten Morgen';
+    if (h < 17) return 'Guten Tag';
+    return 'Guten Abend';
   }
 
   totalWeekMinutes(): number {
@@ -81,6 +81,6 @@ export class DashboardComponent implements OnInit {
   formatTime(minutes: number): string {
     const h = Math.floor(minutes / 60);
     const m = minutes % 60;
-    return h > 0 ? `${h}h ${m}m` : `${m}m`;
+    return h > 0 ? `${h} Std ${m} Min` : `${m} Min`;
   }
 }

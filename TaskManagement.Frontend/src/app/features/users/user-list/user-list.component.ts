@@ -29,7 +29,7 @@ export class UserListComponent implements OnInit {
     this.loading = true;
     this.userService.getUsers().subscribe({
       next: (u: any[]) => { this.users = u; this.loading = false; },
-      error: () => { this.error = 'Failed to load users'; this.loading = false; }
+      error: () => { this.error = 'Mitglieder konnten nicht geladen werden'; this.loading = false; }
     });
   }
 
@@ -57,11 +57,11 @@ export class UserListComponent implements OnInit {
   formatTime(minutes: number): string {
     const h = Math.floor(minutes / 60);
     const m = minutes % 60;
-    return h > 0 ? `${h}h ${m}m` : `${m}m`;
+    return h > 0 ? `${h} Std ${m} Min` : `${m} Min`;
   }
 
   formatDate(d: string): string {
     if (!d) return '';
-    return new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    return new Date(d).toLocaleDateString('de-DE', { year: 'numeric', month: 'short', day: 'numeric' });
   }
 }

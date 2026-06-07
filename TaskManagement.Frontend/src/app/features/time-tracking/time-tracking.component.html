@@ -1,13 +1,13 @@
 <div class="page">
   <div class="page-header">
     <div>
-      <div class="page-title">Time Tracking</div>
-      <div class="page-subtitle">Track your work time and view weekly reports</div>
+      <div class="page-title">Zeiterfassung</div>
+      <div class="page-subtitle">Erfassen Sie Ihre Arbeitszeit und sehen Sie Wochenberichte</div>
     </div>
   </div>
 
   <div *ngIf="loading" class="loading-center">
-    <div class="spinner"></div> Loading...
+    <div class="spinner"></div> Wird geladen...
   </div>
 
   <div *ngIf="!loading" class="tracking-layout">
@@ -17,40 +17,40 @@
       <div *ngIf="activeWork" class="active-timer-card card">
         <div class="active-pulse">
           <div class="pulse-dot"></div>
-          <span>Active Session</span>
+          <span>Aktive Sitzung</span>
         </div>
         <div class="timer-display">{{ formatElapsed(elapsedSeconds) }}</div>
         <div class="timer-task-info">
-          <div class="timer-task-label">Working on task</div>
+          <div class="timer-task-label">Aufgabe in Bearbeitung</div>
           <div class="timer-task-id">{{ activeWork.taskId }}</div>
         </div>
         <button class="btn btn-danger btn-lg stop-btn" (click)="stopWork()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
             <rect x="4" y="4" width="16" height="16" rx="2"/>
           </svg>
-          Stop Work
+          Arbeit stoppen
         </button>
       </div>
 
       <!-- Start work -->
       <div *ngIf="!activeWork" class="start-work-card card card-body">
-        <h3 class="card-title" style="margin-bottom:16px">Start Tracking</h3>
+        <h3 class="card-title" style="margin-bottom:16px">Erfassung starten</h3>
 
         <div class="form-group">
-          <label class="form-label">Project</label>
+          <label class="form-label">Projekt</label>
           <select class="form-control" [(ngModel)]="selectedProjectId" (change)="onProjectChange()">
-            <option value="">Select a project...</option>
+            <option value="">Projekt auswählen...</option>
             <option *ngFor="let p of projects" [value]="p.id">{{ p.name }}</option>
           </select>
         </div>
 
         <div class="form-group" *ngIf="selectedProjectId">
-          <label class="form-label">Task</label>
+          <label class="form-label">Aufgabe</label>
           <select class="form-control" [(ngModel)]="selectedTaskId">
-            <option value="">Select a task...</option>
+            <option value="">Aufgabe auswählen...</option>
             <option *ngFor="let t of projectTasks" [value]="t.id">{{ t.title }}</option>
           </select>
-          <div *ngIf="projectTasks.length === 0" class="form-hint">No open tasks in this project</div>
+          <div *ngIf="projectTasks.length === 0" class="form-hint">Keine offenen Aufgaben in diesem Projekt</div>
         </div>
 
         <button class="btn btn-primary btn-lg start-btn" (click)="startWork()"
@@ -59,23 +59,23 @@
             <circle cx="12" cy="12" r="10"/>
             <polygon points="10 8 16 12 10 16 10 8" fill="currentColor"/>
           </svg>
-          Start Work
+          Arbeit starten
         </button>
       </div>
 
       <!-- Weekly summary -->
       <div class="weekly-summary card">
         <div class="card-header">
-          <div class="card-title">This Week</div>
+          <div class="card-title">Diese Woche</div>
         </div>
         <div class="week-stats">
           <div class="week-stat">
             <div class="week-stat-value">{{ formatTime(totalWeekMinutes()) }}</div>
-            <div class="week-stat-label">Total Time</div>
+            <div class="week-stat-label">Gesamtzeit</div>
           </div>
           <div class="week-stat">
             <div class="week-stat-value">{{ weekTasks.length }}</div>
-            <div class="week-stat-label">Tasks</div>
+            <div class="week-stat-label">Aufgaben</div>
           </div>
         </div>
       </div>
@@ -85,23 +85,23 @@
     <div class="week-table-panel">
       <div class="card">
         <div class="card-header">
-          <div class="card-title">Weekly Activity</div>
+          <div class="card-title">Wochenaktivität</div>
         </div>
 
         <div *ngIf="weekTasks.length === 0" class="empty">
           <div class="empty-icon">⏱️</div>
-          <div class="empty-title">No activity this week</div>
-          <div class="empty-text">Start tracking time on a task to see it here</div>
+          <div class="empty-title">Diese Woche keine Aktivität</div>
+          <div class="empty-text">Erfassen Sie Zeit für eine Aufgabe, um sie hier zu sehen</div>
         </div>
 
         <table *ngIf="weekTasks.length > 0" class="table">
           <thead>
             <tr>
-              <th>Task</th>
-              <th>Project</th>
-              <th>Sessions</th>
-              <th>Time Logged</th>
-              <th>Last Worked</th>
+              <th>Aufgabe</th>
+              <th>Projekt</th>
+              <th>Sitzungen</th>
+              <th>Erfasste Zeit</th>
+              <th>Zuletzt bearbeitet</th>
             </tr>
           </thead>
           <tbody>
@@ -117,7 +117,7 @@
                 <span style="font-weight:600;color:var(--primary)">{{ formatTime(t.totalMinutes) }}</span>
               </td>
               <td class="text-muted">
-                {{ t.lastLogDate | date:'MMM d, h:mm a' }}
+                {{ t.lastLogDate | date:'dd.MM.yyyy, HH:mm' }}
               </td>
             </tr>
           </tbody>

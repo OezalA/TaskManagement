@@ -20,12 +20,12 @@ interface NavItem {
 export class SidebarComponent implements OnInit {
   navItems: NavItem[] = [
     { label: 'Dashboard', path: '/dashboard', icon: 'home' },
-    { label: 'Projects',  path: '/projects',  icon: 'folder' },
-    { label: 'Tasks',     path: '/tasks',      icon: 'check-square' },
+    { label: 'Projekte',  path: '/projects',  icon: 'folder' },
+    { label: 'Aufgaben',  path: '/tasks',      icon: 'check-square' },
     { label: 'Teams',     path: '/teams',      icon: 'users' },
-    { label: 'Members',   path: '/users',      icon: 'user' },
-    { label: 'Time',      path: '/time-tracking', icon: 'clock' },
-    { label: 'AI Query',  path: '/mcp',           icon: 'ai' },
+    { label: 'Mitglieder', path: '/users',     icon: 'user' },
+    { label: 'Zeit',      path: '/time-tracking', icon: 'clock' },
+    { label: 'KI-Abfrage', path: '/mcp',          icon: 'ai' },
   ];
 
   displayName = '';
@@ -34,7 +34,7 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit(): void {
     const claims = this.authService.getTokenClaims();
-    this.displayName = claims?.name || claims?.preferred_username || claims?.upn || 'User';
+    this.displayName = claims?.name || claims?.preferred_username || claims?.upn || 'Benutzer';
   }
 
   logout(): void {

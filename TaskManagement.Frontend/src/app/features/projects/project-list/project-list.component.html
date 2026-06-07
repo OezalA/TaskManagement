@@ -1,29 +1,29 @@
 <div class="page">
   <div class="page-header">
     <div>
-      <div class="page-title">Projects</div>
-      <div class="page-subtitle">{{ projects.length }} project{{ projects.length !== 1 ? 's' : '' }}</div>
+      <div class="page-title">Projekte</div>
+      <div class="page-subtitle">{{ projects.length }} Projekte</div>
     </div>
     <button class="btn btn-primary" (click)="openCreate()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
       </svg>
-      New Project
+      Neues Projekt
     </button>
   </div>
 
   <div *ngIf="error" class="alert alert-error">{{ error }}</div>
 
   <div *ngIf="loading" class="loading-center">
-    <div class="spinner"></div> Loading projects...
+    <div class="spinner"></div> Projekte werden geladen...
   </div>
 
   <!-- Empty state -->
   <div *ngIf="!loading && projects.length === 0" class="empty">
     <div class="empty-icon">📁</div>
-    <div class="empty-title">No projects yet</div>
-    <div class="empty-text">Create your first project to start managing tasks</div>
-    <button class="btn btn-primary" (click)="openCreate()">Create Project</button>
+    <div class="empty-title">Noch keine Projekte</div>
+    <div class="empty-text">Erstellen Sie Ihr erstes Projekt, um Aufgaben zu verwalten</div>
+    <button class="btn btn-primary" (click)="openCreate()">Projekt erstellen</button>
   </div>
 
   <!-- Projects grid -->
@@ -45,15 +45,15 @@
         </div>
       </div>
       <div class="project-card-footer">
-        <a [routerLink]="['/projects', p.id]" class="btn btn-secondary btn-sm">Open</a>
+        <a [routerLink]="['/projects', p.id]" class="btn btn-secondary btn-sm">Öffnen</a>
         <div class="project-actions">
-          <button class="btn-icon" (click)="openEdit(p)" title="Edit">
+          <button class="btn-icon" (click)="openEdit(p)" title="Bearbeiten">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
               <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
             </svg>
           </button>
-          <button class="btn-icon" (click)="openDelete(p)" title="Delete" style="color:var(--danger)">
+          <button class="btn-icon" (click)="openDelete(p)" title="Löschen" style="color:var(--danger)">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="3 6 5 6 21 6"/>
               <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
@@ -71,23 +71,23 @@
 <div class="modal-backdrop" *ngIf="showCreateModal" (click)="showCreateModal = false">
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <div class="modal-title">New Project</div>
+      <div class="modal-title">Neues Projekt</div>
       <button class="modal-close" (click)="showCreateModal = false">×</button>
     </div>
     <div class="modal-body">
       <div class="form-group">
-        <label class="form-label">Project Name *</label>
-        <input class="form-control" [(ngModel)]="newProject.name" placeholder="e.g. Website Redesign" autofocus>
+        <label class="form-label">Projektname *</label>
+        <input class="form-control" [(ngModel)]="newProject.name" placeholder="z. B. Website-Neugestaltung" autofocus>
       </div>
       <div class="form-group">
-        <label class="form-label">Description</label>
-        <textarea class="form-control" [(ngModel)]="newProject.description" placeholder="What is this project about?" rows="3"></textarea>
+        <label class="form-label">Beschreibung</label>
+        <textarea class="form-control" [(ngModel)]="newProject.description" placeholder="Worum geht es in diesem Projekt?" rows="3"></textarea>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-secondary" (click)="showCreateModal = false">Cancel</button>
+      <button class="btn btn-secondary" (click)="showCreateModal = false">Abbrechen</button>
       <button class="btn btn-primary" (click)="create()" [disabled]="saving || !newProject.name.trim()">
-        {{ saving ? 'Creating...' : 'Create Project' }}
+        {{ saving ? 'Wird erstellt...' : 'Projekt erstellen' }}
       </button>
     </div>
   </div>
@@ -97,23 +97,23 @@
 <div class="modal-backdrop" *ngIf="showEditModal" (click)="showEditModal = false">
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <div class="modal-title">Edit Project</div>
+      <div class="modal-title">Projekt bearbeiten</div>
       <button class="modal-close" (click)="showEditModal = false">×</button>
     </div>
     <div class="modal-body">
       <div class="form-group">
-        <label class="form-label">Project Name *</label>
-        <input class="form-control" [(ngModel)]="editProject.name" placeholder="Project name">
+        <label class="form-label">Projektname *</label>
+        <input class="form-control" [(ngModel)]="editProject.name" placeholder="Projektname">
       </div>
       <div class="form-group">
-        <label class="form-label">Description</label>
-        <textarea class="form-control" [(ngModel)]="editProject.description" placeholder="Description" rows="3"></textarea>
+        <label class="form-label">Beschreibung</label>
+        <textarea class="form-control" [(ngModel)]="editProject.description" placeholder="Beschreibung" rows="3"></textarea>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-secondary" (click)="showEditModal = false">Cancel</button>
+      <button class="btn btn-secondary" (click)="showEditModal = false">Abbrechen</button>
       <button class="btn btn-primary" (click)="update()" [disabled]="saving">
-        {{ saving ? 'Saving...' : 'Save Changes' }}
+        {{ saving ? 'Wird gespeichert...' : 'Änderungen speichern' }}
       </button>
     </div>
   </div>
@@ -123,19 +123,19 @@
 <div class="modal-backdrop" *ngIf="showDeleteModal" (click)="showDeleteModal = false">
   <div class="modal" style="max-width:400px" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <div class="modal-title">Delete Project</div>
+      <div class="modal-title">Projekt löschen</div>
       <button class="modal-close" (click)="showDeleteModal = false">×</button>
     </div>
     <div class="modal-body">
       <p style="color:var(--text-secondary);font-size:14px;line-height:1.6;">
-        Are you sure you want to delete <strong>{{ deleteTarget?.name }}</strong>?
-        This action cannot be undone.
+        Möchten Sie <strong>{{ deleteTarget?.name }}</strong> wirklich löschen?
+        Diese Aktion kann nicht rückgängig gemacht werden.
       </p>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-secondary" (click)="showDeleteModal = false">Cancel</button>
+      <button class="btn btn-secondary" (click)="showDeleteModal = false">Abbrechen</button>
       <button class="btn btn-danger" (click)="confirmDelete()" [disabled]="saving">
-        {{ saving ? 'Deleting...' : 'Delete Project' }}
+        {{ saving ? 'Wird gelöscht...' : 'Projekt löschen' }}
       </button>
     </div>
   </div>

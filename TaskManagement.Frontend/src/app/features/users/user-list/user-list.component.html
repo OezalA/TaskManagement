@@ -1,15 +1,15 @@
 <div class="page">
   <div class="page-header">
     <div>
-      <div class="page-title">Members</div>
-      <div class="page-subtitle">{{ users.length }} member{{ users.length !== 1 ? 's' : '' }}</div>
+      <div class="page-title">Mitglieder</div>
+      <div class="page-subtitle">{{ users.length }} Mitglieder</div>
     </div>
   </div>
 
   <div *ngIf="error" class="alert alert-error">{{ error }}</div>
 
   <div *ngIf="loading" class="loading-center">
-    <div class="spinner"></div> Loading members...
+    <div class="spinner"></div> Mitglieder werden geladen...
   </div>
 
   <div *ngIf="!loading" class="users-layout">
@@ -17,7 +17,7 @@
     <div class="user-list-col">
       <div class="card">
         <div *ngIf="users.length === 0" class="empty">
-          <div class="empty-title">No members found</div>
+          <div class="empty-title">Keine Mitglieder gefunden</div>
         </div>
         <div *ngFor="let u of users" class="user-row"
              [class.user-row-active]="selectedUser?.id === u.id"
@@ -51,22 +51,22 @@
         </div>
 
         <div *ngIf="loadingDetail" class="loading-center">
-          <div class="spinner"></div> Loading...
+          <div class="spinner"></div> Wird geladen...
         </div>
 
         <div *ngIf="!loadingDetail && userWorkLogs" class="card-body" style="padding-top:0">
           <div class="work-summary">
             <div class="work-stat">
               <div class="work-stat-value">{{ formatTime(userWorkLogs.totalMinutes) }}</div>
-              <div class="work-stat-label">Total Time</div>
+              <div class="work-stat-label">Gesamtzeit</div>
             </div>
             <div class="work-stat">
               <div class="work-stat-value">{{ userWorkLogs.count }}</div>
-              <div class="work-stat-label">Work Logs</div>
+              <div class="work-stat-label">Arbeitsprotokolle</div>
             </div>
             <div class="work-stat">
               <div class="work-stat-value">{{ userWorkLogs.week }}</div>
-              <div class="work-stat-label">Period</div>
+              <div class="work-stat-label">Zeitraum</div>
             </div>
           </div>
 
@@ -80,15 +80,15 @@
               </div>
               <div class="worklog-status">
                 <span class="badge" [class.badge-done]="wl.endTime" [class.badge-inprogress]="!wl.endTime">
-                  {{ wl.endTime ? 'Completed' : 'Active' }}
+                  {{ wl.endTime ? 'Abgeschlossen' : 'Aktiv' }}
                 </span>
               </div>
             </div>
           </div>
 
           <div *ngIf="!userWorkLogs.workLogs?.length" class="empty" style="padding:24px 0">
-            <div class="empty-title">No work logs</div>
-            <div class="empty-text">No time tracked for this period</div>
+            <div class="empty-title">Keine Arbeitsprotokolle</div>
+            <div class="empty-text">Für diesen Zeitraum keine Zeit erfasst</div>
           </div>
         </div>
       </div>
@@ -98,7 +98,7 @@
       <div class="card card-body" style="display:flex;align-items:center;justify-content:center;min-height:200px">
         <div style="text-align:center;color:var(--text-muted)">
           <div style="font-size:32px;margin-bottom:8px">👤</div>
-          <div>Select a member to view their work logs</div>
+          <div>Wählen Sie ein Mitglied, um dessen Arbeitsprotokolle zu sehen</div>
         </div>
       </div>
     </div>

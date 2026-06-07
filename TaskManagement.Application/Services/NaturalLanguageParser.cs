@@ -7,127 +7,37 @@ using System.Threading.Tasks;
 namespace TaskManagement.Application.Services
 {
     /// <summary>
-    /// Parses natural language queries and extracts MCP tool parameters
-    /// Example: "Hans bu hafta ne yapti?" -> get_user_weekly_tasks with week=this
+    /// Parst deutschsprachige Abfragen und extrahiert MCP-Tool-Parameter.
+    /// Beispiel: "Was hat Hans diese Woche gemacht?" -> get_user_weekly_tasks mit week=this
+    /// Hinweis: Die internen Parameterwerte (this/last/all) und Tool-Namen bleiben
+    /// auf Englisch, da sie vom Tool-Handler konsumiert werden – nur die Eingabesprache ist Deutsch.
     /// </summary>
     public class NaturalLanguageParser
     {
-        // Pattern definitions for different query types
-        private static readonly Dictionary<string, (string ToolName, Func<Match, Dictionary<string, object>> ExtractParams)> Patterns = new()
-        {
-            // "What did <user> do this week?" / "<user> bu hafta ne yapti?"
-            ["what_did_user_do"] = (
-                "get_user_weekly_tasks",
-                m => new Dictionary<string, object>
-                {
-                    { "week", "this" }
-                }
-            ),
-
-            // "What did <user> do last week?" / "<user> geçen hafta ne yapti?"
-            ["what_did_user_do_last_week"] = (
-                "get_user_weekly_tasks",
-                m => new Dictionary<string, object>
-                {
-                    { "week", "last" }
-                }
-            ),
-
-            // "How much time did <user> spend on <task>?" / "<user> <task>'te ne kadar zaman harcadi?"
-            ["time_on_task"] = (
-                "get_task_time_spent",
-                m => new Dictionary<string, object>
-                {
-                    // Task name from capture group
-                }
-            ),
-
-            // "How much time was spent on <project>?" / "<project>'te ne kadar zaman harcandi?"
-            ["time_on_project"] = (
-                "get_project_time_spent",
-                m => new Dictionary<string, object>()
-            ),
-
-            // "Show <user>'s work logs" / "<user>'in çalişma günlüklerini göster"
-            ["work_logs"] = (
-                "get_user_work_logs",
-                m => new Dictionary<string, object>
-                {
-                    { "week", "all" }
-                }
-            ),
-
-            // "What is <user> working on?" / "<user> şu anda ne üzerinde çalişiyor?"
-            ["active_work"] = (
-                "get_user_active_work",
-                m => new Dictionary<string, object>()
-            ),
-
-            // "Start work on <task>" / "<task>'te çalişmaya başla"
-            ["start_work"] = (
-                "start_task_work",
-                m => new Dictionary<string, object>()
-            ),
-
-            // "Stop working" / "Çalişmayı durdur"
-            ["stop_work"] = (
-                "stop_task_work",
-                m => new Dictionary<string, object>()
-            ),
-        };
-
         /// <summary>
-        /// Parse natural language query and extract MCP tool call
+        /// Parst die natürlichsprachige Abfrage und extrahiert den MCP-Tool-Aufruf.
         /// </summary>
         public ParseResult ParseQuery(string query)
         {
             if (string.IsNullOrWhiteSpace(query))
-                return new ParseResult { Success = false, Error = "Query is empty" };
+                return new ParseResult { Success = false, Error = "Abfrage ist leer" };
 
             query = query.Trim();
 
-            // Try to match each pattern
-            var result = MatchPattern(query);
-
-            return result;
+            return MatchPattern(query);
         }
 
         private ParseResult MatchPattern(string query)
         {
             var queryLower = query.ToLower();
 
-            // Pattern: "what did X do (this/last) week?"
-            if (Regex.IsMatch(queryLower, @"what\s+did\s+(\w+)\s+do\s+(this|last)?\s*week", RegexOptions.IgnoreCase))
+            // Muster: "Was hat <Benutzer> diese/letzte Woche gemacht/getan?"
+            if (Regex.IsMatch(queryLower, @"was\s+hat\s+(\w+)\s+(diese|letzte)\s+woche\s+(gemacht|getan)", RegexOptions.IgnoreCase))
             {
-                var match = Regex.Match(queryLower, @"what\s+did\s+(\w+)\s+do\s+(this|last)?\s*week", RegexOptions.IgnoreCase);
-                var userName = ExtractCapturedValue(query, match, 1);
-                var week = match.Groups[2].Value ?? "this";
-
-                return new ParseResult
-                {
-                    Success = true,
-                    ToolName = "get_user_weekly_tasks",
-                    Parameters = new Dictionary<string, object>
-                    {
-                        { "user_name", userName },
-                        { "week", week.ToLower() }
-                    },
-                    Query = query
-                };
-            }
-
-            // Pattern: "<user> bu hafta ne yapti?" (Turkish)
-            if (Regex.IsMatch(queryLower, @"(\w+)\s+(bu|geçen|son)\s+hafta.*ne\s+yapti", RegexOptions.IgnoreCase))
-            {
-                var match = Regex.Match(queryLower, @"(\w+)\s+(bu|geçen|son)\s+hafta.*ne\s+yapti", RegexOptions.IgnoreCase);
+                var match = Regex.Match(queryLower, @"was\s+hat\s+(\w+)\s+(diese|letzte)\s+woche\s+(gemacht|getan)", RegexOptions.IgnoreCase);
                 var userName = ExtractCapturedValue(query, match, 1);
                 var period = match.Groups[2].Value.ToLower();
-                var week = period switch
-                {
-                    "bu" => "this",
-                    "geçen" or "son" => "last",
-                    _ => "this"
-                };
+                var week = period == "letzte" ? "last" : "this";
 
                 return new ParseResult
                 {
@@ -142,10 +52,10 @@ namespace TaskManagement.Application.Services
                 };
             }
 
-            // Pattern: "show <user>'s work logs / work history"
-            if (Regex.IsMatch(queryLower, @"show\s+(\w+)'?s?\s+(work\s+)?logs", RegexOptions.IgnoreCase))
+            // Muster: "Zeige (die) Arbeitsprotokolle/Arbeitszeiten von <Benutzer>"
+            if (Regex.IsMatch(queryLower, @"arbeits(?:protokolle?|zeiten)\s+von\s+(\w+)", RegexOptions.IgnoreCase))
             {
-                var match = Regex.Match(queryLower, @"show\s+(\w+)'?s?\s+(work\s+)?logs", RegexOptions.IgnoreCase);
+                var match = Regex.Match(queryLower, @"arbeits(?:protokolle?|zeiten)\s+von\s+(\w+)", RegexOptions.IgnoreCase);
                 var userName = ExtractCapturedValue(query, match, 1);
 
                 return new ParseResult
@@ -161,11 +71,11 @@ namespace TaskManagement.Application.Services
                 };
             }
 
-            // Pattern: "How much time on/spent on <project>?"
-            if (Regex.IsMatch(queryLower, @"(how\s+)?much\s+time\s+(on|spent\s+on)\s+(\w+)", RegexOptions.IgnoreCase))
+            // Muster: "Wie viel Zeit wurde für <Projekt> aufgewendet?"
+            if (Regex.IsMatch(queryLower, @"wie\s+viel\s+zeit\s+(?:wurde\s+)?(?:f(?:ü|ue)r)\s+(\w+)", RegexOptions.IgnoreCase))
             {
-                var match = Regex.Match(queryLower, @"(how\s+)?much\s+time\s+(on|spent\s+on)\s+(\w+)", RegexOptions.IgnoreCase);
-                var projectName = ExtractCapturedValue(query, match, 3);
+                var match = Regex.Match(queryLower, @"wie\s+viel\s+zeit\s+(?:wurde\s+)?(?:f(?:ü|ue)r)\s+(\w+)", RegexOptions.IgnoreCase);
+                var projectName = ExtractCapturedValue(query, match, 1);
 
                 return new ParseResult
                 {
@@ -179,10 +89,10 @@ namespace TaskManagement.Application.Services
                 };
             }
 
-            // Pattern: "What is/are <user> working on?"
-            if (Regex.IsMatch(queryLower, @"what\s+is\s+(\w+)\s+working\s+on", RegexOptions.IgnoreCase))
+            // Muster: "Woran arbeitet <Benutzer> (gerade)?"
+            if (Regex.IsMatch(queryLower, @"woran\s+arbeitet\s+(\w+)", RegexOptions.IgnoreCase))
             {
-                var match = Regex.Match(queryLower, @"what\s+is\s+(\w+)\s+working\s+on", RegexOptions.IgnoreCase);
+                var match = Regex.Match(queryLower, @"woran\s+arbeitet\s+(\w+)", RegexOptions.IgnoreCase);
                 var userName = ExtractCapturedValue(query, match, 1);
 
                 return new ParseResult
@@ -197,11 +107,11 @@ namespace TaskManagement.Application.Services
                 };
             }
 
-            // Pattern: "start work on <task>" / "<task>'te çalişmaya başla"
-            if (Regex.IsMatch(queryLower, @"(start\s+work\s+on|start\s+)(.*?)(\?|$)", RegexOptions.IgnoreCase))
+            // Muster: "Starte (die) Arbeit an <Aufgabe>" / "Beginne mit <Aufgabe>"
+            if (Regex.IsMatch(queryLower, @"(?:starte\s+(?:die\s+)?arbeit\s+an|beginne\s+(?:mit\s+)?)(.*?)(?:\?|$)", RegexOptions.IgnoreCase))
             {
-                var match = Regex.Match(queryLower, @"(start\s+work\s+on|start\s+)(.*?)(\?|$)", RegexOptions.IgnoreCase);
-                var taskName = ExtractCapturedValue(query, match, 2)?.Trim();
+                var match = Regex.Match(queryLower, @"(?:starte\s+(?:die\s+)?arbeit\s+an|beginne\s+(?:mit\s+)?)(.*?)(?:\?|$)", RegexOptions.IgnoreCase);
+                var taskName = ExtractCapturedValue(query, match, 1)?.Trim();
 
                 if (!string.IsNullOrEmpty(taskName))
                 {
@@ -218,8 +128,8 @@ namespace TaskManagement.Application.Services
                 }
             }
 
-            // Pattern: "stop work / stop working / stop" (Turkish: "çalişmayı durdur")
-            if (Regex.IsMatch(queryLower, @"(stop\s+(work|working)|çalişmayı\s+durdur|dur)", RegexOptions.IgnoreCase))
+            // Muster: "Arbeit stoppen" / "Stoppe" / "Höre auf zu arbeiten"
+            if (Regex.IsMatch(queryLower, @"(arbeit\s+stoppen|stopp(?:e|en)?|aufh(?:ö|oe)ren|h(?:ö|oe)re?\s+auf)", RegexOptions.IgnoreCase))
             {
                 return new ParseResult
                 {
@@ -230,11 +140,11 @@ namespace TaskManagement.Application.Services
                 };
             }
 
-            // No pattern matched
+            // Kein Muster passt
             return new ParseResult
             {
                 Success = false,
-                Error = $"Could not parse query: {query}",
+                Error = $"Abfrage konnte nicht verarbeitet werden: {query}",
                 Query = query
             };
         }
@@ -248,14 +158,14 @@ namespace TaskManagement.Application.Services
             if (string.IsNullOrEmpty(captured))
                 return null;
 
-            // Return original case-preserved value from original string
+            // Originale Groß-/Kleinschreibung aus der ursprünglichen Zeichenkette beibehalten
             var originalMatch = Regex.Match(original, Regex.Escape(captured), RegexOptions.IgnoreCase);
             return originalMatch.Success ? originalMatch.Value : captured;
         }
     }
 
     /// <summary>
-    /// Result of parsing natural language query
+    /// Ergebnis der natürlichsprachigen Abfrageverarbeitung
     /// </summary>
     public class ParseResult
     {
@@ -268,10 +178,10 @@ namespace TaskManagement.Application.Services
         public override string ToString()
         {
             if (!Success)
-                return $"Parse failed: {Error}";
+                return $"Verarbeitung fehlgeschlagen: {Error}";
 
             var paramStr = string.Join(", ", Parameters?.Select(p => $"{p.Key}={p.Value}") ?? Enumerable.Empty<string>());
-            return $"Tool: {ToolName}, Params: {paramStr}";
+            return $"Tool: {ToolName}, Parameter: {paramStr}";
         }
     }
 }

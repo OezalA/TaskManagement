@@ -51,11 +51,11 @@ export class ProjectDetailComponent implements OnInit {
     this.loading = true;
     this.projectService.getProjectById(this.projectId).subscribe({
       next: (p: any) => { this.project = p; },
-      error: () => { this.error = 'Failed to load project'; }
+      error: () => { this.error = 'Projekt konnte nicht geladen werden'; }
     });
     this.taskService.getByProject(this.projectId).subscribe({
       next: (t: Task[]) => { this.tasks = t; this.loading = false; },
-      error: () => { this.error = 'Failed to load tasks'; this.loading = false; }
+      error: () => { this.error = 'Aufgaben konnten nicht geladen werden'; this.loading = false; }
     });
   }
 
@@ -71,7 +71,7 @@ export class ProjectDetailComponent implements OnInit {
 
   statusLabel(s: number | string): string {
     const n = this.statusNum(s);
-    return ['Todo', 'In Progress', 'Done'][n] ?? 'Unknown';
+    return ['Zu erledigen', 'In Bearbeitung', 'Erledigt'][n] ?? 'Unbekannt';
   }
 
   statusClass(s: number | string): string {
@@ -93,7 +93,7 @@ export class ProjectDetailComponent implements OnInit {
 
   formatDate(d: string): string {
     if (!d) return '';
-    return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return new Date(d).toLocaleDateString('de-DE', { month: 'short', day: 'numeric' });
   }
 
   isOverdue(d: string): boolean {
@@ -140,7 +140,7 @@ export class ProjectDetailComponent implements OnInit {
       next: () => { this.showEditTask = false; this.saving = false; this.load(); },
       error: (err: any) => {
         this.saving = false;
-        this.saveError = err?.error?.Message || err?.message || 'Failed to save. Please try again.';
+        this.saveError = err?.error?.Message || err?.message || 'Speichern fehlgeschlagen. Bitte erneut versuchen.';
       }
     });
   }

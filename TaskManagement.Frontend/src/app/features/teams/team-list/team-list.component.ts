@@ -41,7 +41,7 @@ export class TeamListComponent implements OnInit {
     this.loading = true;
     this.teamService.getAll().subscribe({
       next: (t: Team[]) => { this.teams = t; this.loading = false; },
-      error: () => { this.error = 'Failed to load teams'; this.loading = false; }
+      error: () => { this.error = 'Teams konnten nicht geladen werden'; this.loading = false; }
     });
   }
 

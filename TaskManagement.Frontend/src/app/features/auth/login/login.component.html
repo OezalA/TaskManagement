@@ -5,21 +5,21 @@
       <span class="brand-name">TaskFlow</span>
     </div>
     <div class="login-pitch">
-      <h1>Modern project management for your team</h1>
-      <p>Track tasks, manage projects, log time, and collaborate — all in one place.</p>
+      <h1>Modernes Projektmanagement für Ihr Team</h1>
+      <p>Aufgaben verfolgen, Projekte verwalten, Zeiten erfassen und zusammenarbeiten – alles an einem Ort.</p>
     </div>
     <div class="login-features">
-      <div class="feature-item"><span class="feature-dot"></span>Project &amp; task management</div>
-      <div class="feature-item"><span class="feature-dot"></span>Time tracking &amp; reports</div>
-      <div class="feature-item"><span class="feature-dot"></span>Team collaboration</div>
+      <div class="feature-item"><span class="feature-dot"></span>Projekt- &amp; Aufgabenverwaltung</div>
+      <div class="feature-item"><span class="feature-dot"></span>Zeiterfassung &amp; Berichte</div>
+      <div class="feature-item"><span class="feature-dot"></span>Teamzusammenarbeit</div>
     </div>
   </div>
 
   <div class="login-right">
     <div class="login-card">
       <div class="login-header">
-        <h2>Sign in to TaskFlow</h2>
-        <p>Use your corporate account to continue</p>
+        <h2>Bei TaskFlow anmelden</h2>
+        <p>Melden Sie sich mit Ihrem Geschäftskonto an</p>
       </div>
 
       <div *ngIf="error" class="alert alert-error">{{ error }}</div>
@@ -33,14 +33,14 @@
           <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
           <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
         </svg>
-        {{ windowsLoading ? 'Opening login window...' : 'Sign in with Windows' }}
+        {{ windowsLoading ? 'Anmeldefenster wird geöffnet...' : 'Mit Windows anmelden' }}
       </button>
 
       <!-- Divider -->
       <div class="divider-row">
         <div class="divider-line"></div>
         <button class="divider-btn" (click)="showManual = !showManual">
-          {{ showManual ? 'hide' : 'or paste a token' }}
+          {{ showManual ? 'ausblenden' : 'oder Token einfügen' }}
         </button>
         <div class="divider-line"></div>
       </div>
@@ -48,7 +48,7 @@
       <!-- Manual token (collapsed by default) -->
       <form *ngIf="showManual" (ngSubmit)="login()" class="manual-form">
         <div class="form-group">
-          <label class="form-label" for="token">Bearer Token</label>
+          <label class="form-label" for="token">Bearer-Token</label>
           <textarea
             id="token"
             class="form-control token-input"
@@ -59,11 +59,11 @@
             autocomplete="off"
             spellcheck="false"
           ></textarea>
-          <div class="form-hint">Paste a valid Bearer token from Swagger or your admin</div>
+          <div class="form-hint">Fügen Sie ein gültiges Bearer-Token aus Swagger oder von Ihrem Administrator ein</div>
         </div>
         <button type="submit" class="btn btn-secondary w-full" [disabled]="loading">
           <span *ngIf="loading" class="spinner" style="width:14px;height:14px;border-width:2px;margin-right:6px;vertical-align:middle;"></span>
-          {{ loading ? 'Signing in...' : 'Sign in with token' }}
+          {{ loading ? 'Anmeldung läuft...' : 'Mit Token anmelden' }}
         </button>
       </form>
     </div>

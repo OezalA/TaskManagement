@@ -71,7 +71,7 @@ namespace TaskManagement.Api.Controllers
 
         /// <summary>
         /// Query-style endpoint for natural language-like requests
-        /// Example: "What did user X do this week" or "Hans bu hafta ne yapti?"
+        /// Beispiel: "Was hat Hans diese Woche gemacht?"
         /// </summary>
         [HttpPost("query")]
         public async Task<IActionResult> QueryNaturalLanguage([FromBody] MCPQuery query)
