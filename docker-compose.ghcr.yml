@@ -1,0 +1,40 @@
+# Runs the images PUBLISHED by the CD pipeline (from GHCR) instead of
+# building locally. This is how you'd run/deploy the released version.
+# Usage:
+#   docker compose down                                  # stop the local-build stack first
+#   docker compose -f docker-compose.ghcr.yml pull       # fetch the latest published images
+#   docker compose -f docker-compose.ghcr.yml up -d      # run them
+services:
+  frontend:
+    image: ghcr.io/oezala/taskmanagement-frontend:latest
+    container_name: taskmanagement_frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - api
+
+  api:
+    image: ghcr.io/oezala/taskmanagement-api:latest
+    container_name: taskmanagement_api
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=taskdb;Username=postgres;Password=postgres
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16
+    container_name: taskmanagement_db
+    environment:
+      POSTGRES_DB: taskdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
