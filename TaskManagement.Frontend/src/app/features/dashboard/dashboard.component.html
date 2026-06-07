@@ -1,0 +1,82 @@
+<div class="page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <div class="page-title">{{ greeting }}<span *ngIf="displayName">, {{ displayName.split(' ')[0] }}</span></div>
+      <div class="page-subtitle">Here's what's happening across your workspace</div>
+    </div>
+    <a routerLink="/projects" class="btn btn-primary">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      New Project
+    </a>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Projects</div>
+      <div class="stat-value">{{ projectsCount }}</div>
+      <a routerLink="/projects" class="stat-link">View all →</a>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Team Members</div>
+      <div class="stat-value">{{ usersCount }}</div>
+      <a routerLink="/users" class="stat-link">View all →</a>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Teams</div>
+      <div class="stat-value">{{ teamsCount }}</div>
+      <a routerLink="/teams" class="stat-link">View all →</a>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">This Week</div>
+      <div class="stat-value">{{ formatTime(totalWeekMinutes()) }}</div>
+      <div class="stat-sub">{{ thisWeekTasks.length }} tasks logged</div>
+    </div>
+  </div>
+
+  <!-- Active work banner -->
+  <div *ngIf="activeWork" class="active-work-banner">
+    <div class="active-dot"></div>
+    <div class="active-work-info">
+      <span class="active-label">Currently working on</span>
+      <span class="active-task">{{ activeWork.taskId }}</span>
+    </div>
+    <a routerLink="/time-tracking" class="btn btn-secondary btn-sm">Manage</a>
+  </div>
+
+  <!-- This week's tasks -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">This Week's Tasks</div>
+      <a routerLink="/time-tracking" class="btn btn-ghost btn-sm">View time report →</a>
+    </div>
+
+    <div *ngIf="loading" class="loading-center">
+      <div class="spinner"></div>
+      Loading...
+    </div>
+
+    <div *ngIf="!loading && thisWeekTasks.length === 0" class="empty">
+      <div class="empty-icon">📋</div>
+      <div class="empty-title">No tasks logged this week</div>
+      <div class="empty-text">Start tracking time on your tasks to see them here</div>
+      <a routerLink="/projects" class="btn btn-primary">Browse Projects</a>
+    </div>
+
+    <div *ngIf="!loading && thisWeekTasks.length > 0" class="week-tasks">
+      <div *ngFor="let task of thisWeekTasks" class="week-task-row">
+        <div class="week-task-main">
+          <div class="week-task-title">{{ task.taskTitle }}</div>
+          <div class="week-task-project">{{ task.projectName }}</div>
+        </div>
+        <div class="week-task-stats">
+          <span class="week-task-time">{{ formatTime(task.totalMinutes) }}</span>
+          <span class="week-task-logs text-muted">{{ task.logCount }} log{{ task.logCount !== 1 ? 's' : '' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

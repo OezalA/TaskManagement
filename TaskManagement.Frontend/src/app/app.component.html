@@ -1,0 +1,12 @@
+<ng-container *ngIf="authService.isAuthenticated$ | async; else loginLayout">
+  <div class="app-shell">
+    <app-sidebar></app-sidebar>
+    <main class="app-main">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</ng-container>
+
+<ng-template #loginLayout>
+  <router-outlet></router-outlet>
+</ng-template>

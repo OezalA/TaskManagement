@@ -2,6 +2,7 @@
 using System.Text.Json;
 using TaskManagement.Application.Errors;
 using TaskManagement.Application.Exceptions;
+using UnauthorizedException = TaskManagement.Application.Exceptions.UnauthorizedException;
 
 namespace TaskManagement.Api.Middleware;
 
@@ -20,6 +21,10 @@ public sealed class ExceptionHandlingMiddleware
         {
             await _next(context);
         }
+        catch (UnauthorizedException ex)
+        {
+            await HandleUnauthorizedAsync(context, ex);
+        }
         catch (BusinessException ex)
         {
             await HandleBusinessExceptionAsync(context, ex);
@@ -28,6 +33,20 @@ public sealed class ExceptionHandlingMiddleware
         {
             await HandleSystemExceptionAsync(context, ex);
         }
+    }
+
+    private static async Task HandleUnauthorizedAsync(HttpContext context, UnauthorizedException exception)
+    {
+        var error = new ApiError
+        {
+            Status = StatusCodes.Status401Unauthorized,
+            Code = exception.ErrorCode,
+            Message = exception.Message,
+            TraceId = context.TraceIdentifier
+        };
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = error.Status;
+        await context.Response.WriteAsync(JsonSerializer.Serialize(error));
     }
 
     private static async Task HandleBusinessExceptionAsync(
@@ -60,11 +79,14 @@ public sealed class ExceptionHandlingMiddleware
         HttpContext context,
         Exception exception)
     {
+        var isDev = context.RequestServices
+            .GetRequiredService<IHostEnvironment>().IsDevelopment();
+
         var error = new ApiError
         {
             Status = StatusCodes.Status500InternalServerError,
             Code = "InternalServerError",
-            Message = "An unexpected error occurred.",
+            Message = isDev ? $"{exception.GetType().Name}: {exception.Message}" : "An unexpected error occurred.",
             TraceId = context.TraceIdentifier
         };
 

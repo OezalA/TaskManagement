@@ -10,26 +10,29 @@ using TaskManagement.MCP;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Entra ID (Azure AD) bearer-token validation for the API.
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
-// for MCP
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("ApiAccess", policy =>
-    {
-        policy.RequireAssertion(context =>
-            context.User.Claims.Any(c =>
-                (c.Type == "scp" ||
-                 c.Type == "http://schemas.microsoft.com/identity/claims/scope")
-                && c.Value.Contains("access_api")));
-    });
+        policy.RequireAuthenticatedUser());
+
+    // Every endpoint requires an authenticated user unless it opts out with [AllowAnonymous].
+    options.FallbackPolicy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(p =>
+        p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 });
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -45,7 +48,6 @@ builder.Services.AddScoped<IWorkLogQueryService, WorkLogQueryService>();
 builder.Services.AddScoped<IUserResolutionService, UserResolutionService>();
 builder.Services.AddHttpContextAccessor();
 
-// MCP Integration
 builder.Services.AddHttpClient<MCPToolHandler>((provider, client) =>
 {
     var apiBaseUrl = builder.Configuration["MCPSettings:ApiBaseUrl"] ?? "http://localhost:5253";
@@ -62,39 +64,38 @@ builder.Services.AddScoped(sp =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-const string schemeId = "oauth2";
+    const string schemeId = "oauth2";
 
-var tenantId =
-    builder.Configuration["SwaggerAzureAd:TenantId"]
-    ?? throw new InvalidOperationException("Missing config: SwaggerAzureAd:TenantId");
+    var tenantId =
+        builder.Configuration["SwaggerAzureAd:TenantId"]
+        ?? throw new InvalidOperationException("Missing config: SwaggerAzureAd:TenantId");
 
-var clientId =
-    builder.Configuration["AzureAd:ClientId"]
-    ?? throw new InvalidOperationException("Missing config: AzureAd:ClientId");
+    var clientId =
+        builder.Configuration["AzureAd:ClientId"]
+        ?? throw new InvalidOperationException("Missing config: AzureAd:ClientId");
 
-var scope = $"api://{clientId}/access_api";
+    var scope = $"api://{clientId}/access_api";
 
-options.AddSecurityDefinition(schemeId, new OpenApiSecurityScheme
-{
-    Type = SecuritySchemeType.OAuth2,
-    Flows = new OpenApiOAuthFlows
+    options.AddSecurityDefinition(schemeId, new OpenApiSecurityScheme
     {
-        AuthorizationCode = new OpenApiOAuthFlow
+        Type = SecuritySchemeType.OAuth2,
+        Flows = new OpenApiOAuthFlows
         {
-            AuthorizationUrl = new Uri(
-                $"https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/authorize"
-            ),
-            TokenUrl = new Uri(
-                $"https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/token"
-            ),
-            Scopes = new Dictionary<string, string>
+            AuthorizationCode = new OpenApiOAuthFlow
             {
-                [scope] = "Access TaskManagement API"
+                AuthorizationUrl = new Uri(
+                    $"https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/authorize"
+                ),
+                TokenUrl = new Uri(
+                    $"https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/token"
+                ),
+                Scopes = new Dictionary<string, string>
+                {
+                    [scope] = "Access TaskManagement API"
+                }
             }
         }
-    }
-});
-    // Swashbuckle v10 uyumlu SecurityRequirement
+    });
     options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
     {
         [new OpenApiSecuritySchemeReference(schemeId, document)]
@@ -107,7 +108,6 @@ var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -122,11 +122,11 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseCors();
 
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
-
 app.UseAuthorization();
 
 app.MapControllers();

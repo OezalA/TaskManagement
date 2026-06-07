@@ -40,15 +40,6 @@ namespace TaskManagement.Infrastructure.Services
                 throw new NotFoundException($"Task with ID {taskId} not found.", "task_not_found");
             }
 
-            // Rule 3: Check if task is assigned to the user (optional but recommended)
-            if (task.AssignedUserId != userId)
-            {
-                throw new ConflictException(
-                    $"Task {taskId} is not assigned to user {userId}. " +
-                    $"Only assigned users can log work on this task.",
-                    "task_not_assigned_to_user");
-            }
-
             // Create new WorkLog
             var workLog = new WorkLog
             {

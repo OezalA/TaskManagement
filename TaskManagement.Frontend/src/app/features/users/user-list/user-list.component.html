@@ -1,0 +1,106 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Members</div>
+      <div class="page-subtitle">{{ users.length }} member{{ users.length !== 1 ? 's' : '' }}</div>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <div *ngIf="loading" class="loading-center">
+    <div class="spinner"></div> Loading members...
+  </div>
+
+  <div *ngIf="!loading" class="users-layout">
+    <!-- User list -->
+    <div class="user-list-col">
+      <div class="card">
+        <div *ngIf="users.length === 0" class="empty">
+          <div class="empty-title">No members found</div>
+        </div>
+        <div *ngFor="let u of users" class="user-row"
+             [class.user-row-active]="selectedUser?.id === u.id"
+             (click)="selectUser(u)">
+          <div class="avatar avatar-lg">{{ initials(u.displayName) }}</div>
+          <div class="user-info">
+            <div class="user-name">{{ u.displayName }}</div>
+            <div class="user-email">{{ u.email }}</div>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               *ngIf="selectedUser?.id === u.id" style="color:var(--primary);flex-shrink:0">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- User detail panel -->
+    <div class="user-detail-col" *ngIf="selectedUser">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">{{ selectedUser.displayName }}</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px">{{ selectedUser.email }}</div>
+          </div>
+          <div class="week-filter">
+            <input type="week" class="form-control" [(ngModel)]="selectedWeek"
+                   (change)="loadUserDetail(selectedUser.id)"
+                   style="width:auto;padding:5px 8px;font-size:12px;">
+          </div>
+        </div>
+
+        <div *ngIf="loadingDetail" class="loading-center">
+          <div class="spinner"></div> Loading...
+        </div>
+
+        <div *ngIf="!loadingDetail && userWorkLogs" class="card-body" style="padding-top:0">
+          <div class="work-summary">
+            <div class="work-stat">
+              <div class="work-stat-value">{{ formatTime(userWorkLogs.totalMinutes) }}</div>
+              <div class="work-stat-label">Total Time</div>
+            </div>
+            <div class="work-stat">
+              <div class="work-stat-value">{{ userWorkLogs.count }}</div>
+              <div class="work-stat-label">Work Logs</div>
+            </div>
+            <div class="work-stat">
+              <div class="work-stat-value">{{ userWorkLogs.week }}</div>
+              <div class="work-stat-label">Period</div>
+            </div>
+          </div>
+
+          <div *ngIf="userWorkLogs.workLogs?.length > 0" class="worklogs-list">
+            <div *ngFor="let wl of userWorkLogs.workLogs" class="worklog-row">
+              <div class="worklog-time">
+                <div style="font-size:13px;font-weight:500;color:var(--text-primary)">
+                  {{ formatTime(wl.durationMinutes || 0) }}
+                </div>
+                <div style="font-size:11px;color:var(--text-muted)">{{ formatDate(wl.startTime) }}</div>
+              </div>
+              <div class="worklog-status">
+                <span class="badge" [class.badge-done]="wl.endTime" [class.badge-inprogress]="!wl.endTime">
+                  {{ wl.endTime ? 'Completed' : 'Active' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="!userWorkLogs.workLogs?.length" class="empty" style="padding:24px 0">
+            <div class="empty-title">No work logs</div>
+            <div class="empty-text">No time tracked for this period</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="user-detail-col" *ngIf="!selectedUser">
+      <div class="card card-body" style="display:flex;align-items:center;justify-content:center;min-height:200px">
+        <div style="text-align:center;color:var(--text-muted)">
+          <div style="font-size:32px;margin-bottom:8px">👤</div>
+          <div>Select a member to view their work logs</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

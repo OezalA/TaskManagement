@@ -1,0 +1,148 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Teams</div>
+      <div class="page-subtitle">{{ teams.length }} team{{ teams.length !== 1 ? 's' : '' }}</div>
+    </div>
+    <button class="btn btn-primary" (click)="openCreate()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      New Team
+    </button>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <div *ngIf="loading" class="loading-center">
+    <div class="spinner"></div> Loading teams...
+  </div>
+
+  <div *ngIf="!loading && teams.length === 0" class="empty">
+    <div class="empty-icon">👥</div>
+    <div class="empty-title">No teams yet</div>
+    <div class="empty-text">Create a team and add members to collaborate</div>
+    <button class="btn btn-primary" (click)="openCreate()">Create Team</button>
+  </div>
+
+  <div *ngIf="!loading && teams.length > 0" class="teams-list">
+    <div class="team-card" *ngFor="let t of teams">
+      <div class="team-card-header" (click)="toggleTeam(t)">
+        <div class="team-icon">{{ t.name[0].toUpperCase() }}</div>
+        <div class="team-info">
+          <div class="team-name">{{ t.name }}</div>
+          <div class="team-meta">
+            {{ membersOf(t.id).length }} member{{ membersOf(t.id).length !== 1 ? 's' : '' }}
+          </div>
+        </div>
+        <div class="team-header-actions">
+          <button class="btn btn-secondary btn-sm" (click)="openAddMember(t); $event.stopPropagation()">+ Add Member</button>
+          <button class="btn-icon" (click)="openDelete(t); $event.stopPropagation()" style="color:var(--danger)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+            </svg>
+          </button>
+          <svg class="chevron" [class.open]="expandedTeamId === t.id"
+               width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Members section -->
+      <div class="team-members" *ngIf="expandedTeamId === t.id">
+        <div *ngIf="loadingMembers[t.id]" class="loading-center" style="padding:20px">
+          <div class="spinner"></div>
+        </div>
+
+        <div *ngIf="!loadingMembers[t.id]">
+          <div *ngIf="membersOf(t.id).length === 0" style="padding:16px 20px;font-size:13px;color:var(--text-muted)">
+            No members yet. Add members using the button above.
+          </div>
+          <div *ngFor="let m of membersOf(t.id)" class="member-row">
+            <div class="avatar avatar-sm">{{ initials(m.userName || '?') }}</div>
+            <div class="member-name">{{ m.userName || m.userId }}</div>
+            <button class="btn-icon" (click)="removeMember(t.id, m.userId)" title="Remove"
+                    style="color:var(--danger);margin-left:auto">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Team Modal -->
+<div class="modal-backdrop" *ngIf="showCreateModal" (click)="showCreateModal = false">
+  <div class="modal" style="max-width:400px" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">New Team</div>
+      <button class="modal-close" (click)="showCreateModal = false">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Team Name *</label>
+        <input class="form-control" [(ngModel)]="newTeamName" placeholder="e.g. Frontend Team" autofocus>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="showCreateModal = false">Cancel</button>
+      <button class="btn btn-primary" (click)="createTeam()" [disabled]="saving || !newTeamName.trim()">
+        {{ saving ? 'Creating...' : 'Create Team' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm -->
+<div class="modal-backdrop" *ngIf="showDeleteModal" (click)="showDeleteModal = false">
+  <div class="modal" style="max-width:400px" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">Delete Team</div>
+      <button class="modal-close" (click)="showDeleteModal = false">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--text-secondary);font-size:14px;line-height:1.6;">
+        Delete team <strong>{{ deleteTarget?.name }}</strong>? This cannot be undone.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="showDeleteModal = false">Cancel</button>
+      <button class="btn btn-danger" (click)="confirmDelete()" [disabled]="saving">
+        {{ saving ? 'Deleting...' : 'Delete' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Member Modal -->
+<div class="modal-backdrop" *ngIf="showAddMemberModal" (click)="showAddMemberModal = false">
+  <div class="modal" style="max-width:400px" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">Add Member to {{ addMemberTarget?.name }}</div>
+      <button class="modal-close" (click)="showAddMemberModal = false">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Select Member</label>
+        <select class="form-control" [(ngModel)]="selectedUserId">
+          <option value="">Choose a member...</option>
+          <option *ngFor="let u of availableUsers(addMemberTarget?.id || '')" [value]="u.id">
+            {{ u.displayName }}
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="showAddMemberModal = false">Cancel</button>
+      <button class="btn btn-primary" (click)="addMember()" [disabled]="saving || !selectedUserId">
+        {{ saving ? 'Adding...' : 'Add Member' }}
+      </button>
+    </div>
+  </div>
+</div>

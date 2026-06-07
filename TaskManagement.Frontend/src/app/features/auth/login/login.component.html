@@ -1,0 +1,71 @@
+<div class="login-page">
+  <div class="login-left">
+    <div class="login-brand">
+      <div class="brand-icon">T</div>
+      <span class="brand-name">TaskFlow</span>
+    </div>
+    <div class="login-pitch">
+      <h1>Modern project management for your team</h1>
+      <p>Track tasks, manage projects, log time, and collaborate — all in one place.</p>
+    </div>
+    <div class="login-features">
+      <div class="feature-item"><span class="feature-dot"></span>Project &amp; task management</div>
+      <div class="feature-item"><span class="feature-dot"></span>Time tracking &amp; reports</div>
+      <div class="feature-item"><span class="feature-dot"></span>Team collaboration</div>
+    </div>
+  </div>
+
+  <div class="login-right">
+    <div class="login-card">
+      <div class="login-header">
+        <h2>Sign in to TaskFlow</h2>
+        <p>Use your corporate account to continue</p>
+      </div>
+
+      <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+      <!-- Windows / Entra ID login button -->
+      <button class="btn-windows" (click)="loginWithWindows()" [disabled]="windowsLoading || loading">
+        <span *ngIf="windowsLoading" class="spinner" style="width:18px;height:18px;border-width:2px;border-color:rgba(255,255,255,0.3);border-top-color:white;"></span>
+        <svg *ngIf="!windowsLoading" class="ms-logo" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
+          <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
+          <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
+          <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
+        </svg>
+        {{ windowsLoading ? 'Opening login window...' : 'Sign in with Windows' }}
+      </button>
+
+      <!-- Divider -->
+      <div class="divider-row">
+        <div class="divider-line"></div>
+        <button class="divider-btn" (click)="showManual = !showManual">
+          {{ showManual ? 'hide' : 'or paste a token' }}
+        </button>
+        <div class="divider-line"></div>
+      </div>
+
+      <!-- Manual token (collapsed by default) -->
+      <form *ngIf="showManual" (ngSubmit)="login()" class="manual-form">
+        <div class="form-group">
+          <label class="form-label" for="token">Bearer Token</label>
+          <textarea
+            id="token"
+            class="form-control token-input"
+            [(ngModel)]="token"
+            name="token"
+            placeholder="eyJ0eXAiOiJKV1QiLCJhbGciOi..."
+            rows="5"
+            autocomplete="off"
+            spellcheck="false"
+          ></textarea>
+          <div class="form-hint">Paste a valid Bearer token from Swagger or your admin</div>
+        </div>
+        <button type="submit" class="btn btn-secondary w-full" [disabled]="loading">
+          <span *ngIf="loading" class="spinner" style="width:14px;height:14px;border-width:2px;margin-right:6px;vertical-align:middle;"></span>
+          {{ loading ? 'Signing in...' : 'Sign in with token' }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

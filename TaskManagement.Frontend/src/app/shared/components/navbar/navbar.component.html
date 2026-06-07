@@ -1,0 +1,20 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    <div class="navbar-brand">
+      <a routerLink="/dashboard" class="logo">📊 Task Manager</a>
+    </div>
+
+    <div class="navbar-menu" *ngIf="isAuthenticated">
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/tasks" routerLinkActive="active">Tasks</a>
+      <a routerLink="/projects" routerLinkActive="active">Projects</a>
+      <a routerLink="/users" routerLinkActive="active">Users</a>
+      <a routerLink="/time-tracking" routerLinkActive="active">Time Tracking</a>
+      <a routerLink="/nlp-query" routerLinkActive="active">AI Query</a>
+      
+      <div class="navbar-right">
+        <button class="logout-btn" (click)="logout()">Logout</button>
+      </div>
+    </div>
+  </div>
+</nav>

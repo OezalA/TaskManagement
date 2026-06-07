@@ -1,0 +1,260 @@
+<div class="page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <div class="back-link">
+        <a routerLink="/projects">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          Projects
+        </a>
+      </div>
+      <div class="page-title">{{ project?.name || 'Loading...' }}</div>
+      <div class="page-subtitle" *ngIf="project?.description">{{ project.description }}</div>
+    </div>
+    <button class="btn btn-primary" (click)="openCreate()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Add Task
+    </button>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <div *ngIf="loading" class="loading-center">
+    <div class="spinner"></div> Loading tasks...
+  </div>
+
+  <!-- Kanban board -->
+  <div *ngIf="!loading" class="kanban">
+    <!-- Todo column -->
+    <div class="kanban-col">
+      <div class="kanban-header" style="color:var(--info-text)">
+        <span>Todo</span>
+        <span class="kanban-count">{{ todoTasks.length }}</span>
+      </div>
+      <div class="kanban-body">
+        <div *ngIf="todoTasks.length === 0" class="kanban-empty">No tasks</div>
+        <div class="task-card" *ngFor="let t of todoTasks" (click)="openEdit(t)">
+          <div class="task-card-title">{{ t.title }}</div>
+          <div class="task-card-meta">
+            <div class="avatar avatar-sm" *ngIf="assignedName(t)" [title]="assignedName(t)">
+              {{ initials(assignedName(t)) }}
+            </div>
+            <span *ngIf="!assignedName(t)" class="unassigned">Unassigned</span>
+            <span class="task-card-due" *ngIf="t.dueDate"
+                  [class.overdue]="isOverdue(t.dueDate)">
+              {{ formatDate(t.dueDate) }}
+            </span>
+          </div>
+          <div class="task-actions" (click)="$event.stopPropagation()">
+            <select class="assign-select" [(ngModel)]="t.assignedUserId"
+                    (change)="quickAssign(t, t.assignedUserId || '')">
+              <option value="">Assign...</option>
+              <option *ngFor="let u of users" [value]="u.id">{{ u.displayName }}</option>
+            </select>
+            <button class="btn btn-sm" [class.btn-primary]="!isActive(t)"
+                    [class.btn-danger]="isActive(t)"
+                    (click)="toggleWork(t)" [title]="isActive(t) ? 'Stop Work' : 'Start Work'">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline *ngIf="!isActive(t)" points="10 8 16 12 10 16 10 8"/>
+                <rect *ngIf="isActive(t)" x="6" y="6" width="12" height="12" rx="2"/>
+              </svg>
+              {{ isActive(t) ? 'Stop' : 'Start' }}
+            </button>
+            <button class="btn btn-secondary btn-sm" (click)="setStatus(t, 1)">→ In Progress</button>
+            <button class="btn-icon" (click)="openDelete(t)" style="color:var(--danger)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- In Progress column -->
+    <div class="kanban-col">
+      <div class="kanban-header" style="color:var(--warning-text)">
+        <span>In Progress</span>
+        <span class="kanban-count">{{ inProgressTasks.length }}</span>
+      </div>
+      <div class="kanban-body">
+        <div *ngIf="inProgressTasks.length === 0" class="kanban-empty">No tasks</div>
+        <div class="task-card" *ngFor="let t of inProgressTasks" (click)="openEdit(t)">
+          <div class="task-card-title">{{ t.title }}</div>
+          <div class="task-card-meta">
+            <div class="avatar avatar-sm" *ngIf="assignedName(t)" [title]="assignedName(t)">
+              {{ initials(assignedName(t)) }}
+            </div>
+            <span *ngIf="!assignedName(t)" class="unassigned">Unassigned</span>
+            <span class="task-card-due" *ngIf="t.dueDate"
+                  [class.overdue]="isOverdue(t.dueDate)">
+              {{ formatDate(t.dueDate) }}
+            </span>
+          </div>
+          <div class="task-actions" (click)="$event.stopPropagation()">
+            <select class="assign-select" [(ngModel)]="t.assignedUserId"
+                    (change)="quickAssign(t, t.assignedUserId || '')">
+              <option value="">Assign...</option>
+              <option *ngFor="let u of users" [value]="u.id">{{ u.displayName }}</option>
+            </select>
+            <button class="btn btn-sm" [class.btn-primary]="!isActive(t)"
+                    [class.btn-danger]="isActive(t)"
+                    (click)="toggleWork(t)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline *ngIf="!isActive(t)" points="10 8 16 12 10 16 10 8"/>
+                <rect *ngIf="isActive(t)" x="6" y="6" width="12" height="12" rx="2"/>
+              </svg>
+              {{ isActive(t) ? 'Stop' : 'Start' }}
+            </button>
+            <button class="btn btn-secondary btn-sm" (click)="setStatus(t, 0)">← Todo</button>
+            <button class="btn btn-secondary btn-sm" (click)="setStatus(t, 2)">Done ✓</button>
+            <button class="btn-icon" (click)="openDelete(t)" style="color:var(--danger)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Done column -->
+    <div class="kanban-col">
+      <div class="kanban-header" style="color:var(--success-text)">
+        <span>Done</span>
+        <span class="kanban-count">{{ doneTasks.length }}</span>
+      </div>
+      <div class="kanban-body">
+        <div *ngIf="doneTasks.length === 0" class="kanban-empty">No tasks</div>
+        <div class="task-card done-card" *ngFor="let t of doneTasks" (click)="openEdit(t)">
+          <div class="task-card-title done-title">{{ t.title }}</div>
+          <div class="task-card-meta">
+            <div class="avatar avatar-sm" *ngIf="assignedName(t)" [title]="assignedName(t)">
+              {{ initials(assignedName(t)) }}
+            </div>
+            <span *ngIf="!assignedName(t)" class="unassigned">Unassigned</span>
+          </div>
+          <div class="task-actions" (click)="$event.stopPropagation()">
+            <select class="assign-select" [(ngModel)]="t.assignedUserId"
+                    (change)="quickAssign(t, t.assignedUserId || '')">
+              <option value="">Assign...</option>
+              <option *ngFor="let u of users" [value]="u.id">{{ u.displayName }}</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" (click)="setStatus(t, 1)">↩ Reopen</button>
+            <button class="btn-icon" (click)="openDelete(t)" style="color:var(--danger)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Task Modal -->
+<div class="modal-backdrop" *ngIf="showCreateTask" (click)="showCreateTask = false">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">New Task</div>
+      <button class="modal-close" (click)="showCreateTask = false">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Title *</label>
+        <input class="form-control" [(ngModel)]="newTask.title" placeholder="Task title" autofocus>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-control" [(ngModel)]="newTask.description" placeholder="Task description" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Due Date</label>
+        <input type="date" class="form-control" [(ngModel)]="newTask.dueDate">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="showCreateTask = false">Cancel</button>
+      <button class="btn btn-primary" (click)="createTask()" [disabled]="saving || !newTask.title.trim()">
+        {{ saving ? 'Creating...' : 'Create Task' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Task Modal -->
+<div class="modal-backdrop" *ngIf="showEditTask" (click)="showEditTask = false">
+  <div class="modal" style="max-width:520px" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">Edit Task</div>
+      <button class="modal-close" (click)="showEditTask = false">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Title *</label>
+        <input class="form-control" [(ngModel)]="editingTask.title" placeholder="Task title">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-control" [(ngModel)]="editingTask.description" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-control" [(ngModel)]="editingTask.status">
+          <option [ngValue]="0">Todo</option>
+          <option [ngValue]="1">In Progress</option>
+          <option [ngValue]="2">Done</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Assigned To</label>
+        <select class="form-control" [(ngModel)]="editingTask.assignedUserId">
+          <option value="">Unassigned</option>
+          <option *ngFor="let u of users" [value]="u.id">{{ u.displayName }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Due Date</label>
+        <input type="date" class="form-control" [(ngModel)]="editingTask.dueDate">
+      </div>
+    </div>
+    <div *ngIf="saveError" class="alert alert-error" style="margin:0 20px 8px">{{ saveError }}</div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="showEditTask = false">Cancel</button>
+      <button class="btn btn-primary" (click)="updateTask()" [disabled]="saving">
+        {{ saving ? 'Saving...' : 'Save Changes' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Task Confirm -->
+<div class="modal-backdrop" *ngIf="showDeleteTask" (click)="showDeleteTask = false">
+  <div class="modal" style="max-width:400px" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">Delete Task</div>
+      <button class="modal-close" (click)="showDeleteTask = false">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--text-secondary);font-size:14px;line-height:1.6;">
+        Delete <strong>{{ deleteTarget?.title }}</strong>? This cannot be undone.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="showDeleteTask = false">Cancel</button>
+      <button class="btn btn-danger" (click)="confirmDelete()" [disabled]="saving">
+        {{ saving ? 'Deleting...' : 'Delete' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,183 @@
+<div class="mcp-layout">
+
+  <!-- Left: Query Panel -->
+  <div class="mcp-main">
+    <div class="page-header">
+      <div>
+        <div class="page-title">AI Query Panel</div>
+        <div class="page-subtitle">Doğal dil sorguları veya direkt araç çalıştırma</div>
+      </div>
+      <div class="mode-tabs">
+        <button class="mode-tab" [class.active]="mode === 'nl'" (click)="setMode('nl')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          Natural Language
+        </button>
+        <button class="mode-tab" [class.active]="mode === 'tool'" (click)="setMode('tool')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+          </svg>
+          Tool Execute
+        </button>
+      </div>
+    </div>
+
+    <!-- Natural Language Mode -->
+    <div *ngIf="mode === 'nl'" class="query-section card">
+      <div class="query-box">
+        <svg class="query-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input class="query-input" [(ngModel)]="query"
+               placeholder="Ör: What did Ahmet do this week? / Mehmet bu hafta ne yaptı?"
+               (keyup.enter)="submitQuery()">
+        <button class="btn btn-primary" (click)="submitQuery()" [disabled]="loading || !query.trim()">
+          <span *ngIf="loading" class="spinner" style="width:14px;height:14px;border-width:2px"></span>
+          <svg *ngIf="!loading" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+          {{ loading ? 'Running...' : 'Send' }}
+        </button>
+      </div>
+
+      <!-- Chips -->
+      <div class="chips-row">
+        <button class="chip" *ngFor="let c of chips" (click)="useChip(c)">{{ c }}</button>
+      </div>
+
+      <!-- Supported patterns hint -->
+      <div class="pattern-hint">
+        <span class="hint-label">Desteklenen sorgular:</span>
+        <span class="hint-item">What did [kişi] do this/last week?</span>
+        <span class="hint-sep">·</span>
+        <span class="hint-item">Show [kişi] work logs</span>
+        <span class="hint-sep">·</span>
+        <span class="hint-item">What is [kişi] working on?</span>
+        <span class="hint-sep">·</span>
+        <span class="hint-item">How much time on [proje]?</span>
+      </div>
+    </div>
+
+    <!-- Tool Execute Mode -->
+    <div *ngIf="mode === 'tool'" class="tool-section card">
+      <div class="tool-selector">
+        <label class="form-label">Araç Seç</label>
+        <div class="tool-list">
+          <button *ngFor="let t of tools" class="tool-btn"
+                  [class.active]="selectedTool.name === t.name"
+                  (click)="selectedTool = t; toolResult = null; toolError = ''">
+            {{ t.label }}
+          </button>
+        </div>
+      </div>
+
+      <div class="tool-params">
+        <div *ngFor="let p of selectedTool.params" class="form-group">
+          <label class="form-label">{{ p.label }}<span *ngIf="p.required" style="color:var(--danger)"> *</span></label>
+          <select *ngIf="p.type === 'user'" class="form-control" [(ngModel)]="p.value">
+            <option value="">-- Kullanıcı seç --</option>
+            <option *ngFor="let u of users" [value]="u.id">{{ u.displayName }}</option>
+          </select>
+          <select *ngIf="p.type === 'project'" class="form-control" [(ngModel)]="p.value">
+            <option value="">-- Proje seç --</option>
+            <option *ngFor="let pr of projects" [value]="pr.id">{{ pr.name }}</option>
+          </select>
+          <select *ngIf="p.type === 'select'" class="form-control" [(ngModel)]="p.value">
+            <option *ngFor="let o of p.options" [value]="o">{{ o }}</option>
+          </select>
+          <input *ngIf="p.type === 'text'" class="form-control" [(ngModel)]="p.value" [placeholder]="p.label">
+        </div>
+      </div>
+
+      <button class="btn btn-primary" (click)="runTool()" [disabled]="toolLoading">
+        <span *ngIf="toolLoading" class="spinner" style="width:14px;height:14px;border-width:2px"></span>
+        {{ toolLoading ? 'Running...' : 'Run ' + selectedTool.label }}
+      </button>
+    </div>
+
+    <!-- Parsed tool badge (NL mode) -->
+    <div *ngIf="mode === 'nl' && parsedTool" class="parsed-badge">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+      </svg>
+      Araç: <strong>{{ parsedTool }}</strong>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="activeError" class="alert alert-error">{{ activeError }}</div>
+
+    <!-- Results -->
+    <div *ngIf="activeResult && !activeLoading" class="result-card card">
+      <div class="result-header">
+        <div class="result-title">Sonuç</div>
+        <button class="btn-icon" (click)="result = null; toolResult = null" title="Kapat">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Work Logs table -->
+      <div *ngIf="resultIsWorkLogs()">
+        <div class="result-meta" *ngIf="activeResult.totalMinutes !== undefined">
+          <span class="stat-chip">{{ activeResult.count }} kayıt</span>
+          <span class="stat-chip primary">{{ activeResult.totalMinutes }} dk toplam</span>
+        </div>
+        <div class="empty" *ngIf="!activeResult.workLogs?.length">Kayıt bulunamadı.</div>
+        <table class="table" *ngIf="activeResult.workLogs?.length">
+          <thead><tr><th>Task ID</th><th>Başlangıç</th><th>Bitiş</th><th>Süre (dk)</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let w of activeResult.workLogs">
+              <td style="font-size:11px;color:var(--text-muted)">{{ w.taskId | slice:0:8 }}…</td>
+              <td>{{ formatTime(w.startTime) }}</td>
+              <td>{{ w.endTime ? formatTime(w.endTime) : '🔴 Aktif' }}</td>
+              <td>{{ w.durationMinutes ?? '—' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Tasks table -->
+      <div *ngIf="resultIsTasks() && !resultIsWorkLogs()">
+        <div class="empty" *ngIf="!activeResult.tasks?.length">Görev bulunamadı.</div>
+        <table class="table" *ngIf="activeResult.tasks?.length">
+          <thead><tr><th>Görev</th><th>Proje</th><th>Süre (dk)</th><th>Kayıt</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let t of activeResult.tasks">
+              <td>{{ t.taskTitle || t.title }}</td>
+              <td>{{ t.projectName || '—' }}</td>
+              <td>{{ t.totalMinutes ?? 0 }}</td>
+              <td>{{ t.logCount ?? 0 }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Time summary -->
+      <div *ngIf="resultIsTime() && !resultIsWorkLogs() && !resultIsTasks()" class="time-summary">
+        <div class="time-big">{{ activeResult.totalMinutes }} dk</div>
+        <div class="time-sub">≈ {{ (activeResult.totalMinutes / 60) | number:'1.1-1' }} saat</div>
+      </div>
+
+      <!-- Raw JSON -->
+      <div *ngIf="isRaw" class="json-block">
+        <pre>{{ activeResult | json }}</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: History -->
+  <div class="mcp-sidebar">
+    <div class="sidebar-section-title">Geçmiş</div>
+    <div *ngIf="!history.length" class="empty" style="font-size:12px;padding:16px 0">Henüz sorgu yapılmadı.</div>
+    <div class="history-item" *ngFor="let h of history" (click)="selectHistory(h)">
+      <div class="history-query" [title]="h.query">{{ h.query }}</div>
+      <div class="history-meta">
+        <span class="badge badge-default" style="font-size:10px">{{ h.tool }}</span>
+        <span class="history-time">{{ h.ts | date:'HH:mm' }}</span>
+      </div>
+    </div>
+  </div>
+
+</div>

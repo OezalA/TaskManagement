@@ -1,0 +1,97 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Tasks</div>
+      <div class="page-subtitle" *ngIf="selectedProject()">{{ selectedProject()?.name }}</div>
+    </div>
+    <div class="header-controls">
+      <select class="form-control" [(ngModel)]="statusFilter" style="width:150px">
+        <option value="">All statuses</option>
+        <option [ngValue]="0">Todo</option>
+        <option [ngValue]="1">In Progress</option>
+        <option [ngValue]="2">Done</option>
+      </select>
+      <select class="form-control" [(ngModel)]="selectedProjectId" (change)="loadTasks()" style="width:200px">
+        <option *ngFor="let p of projects" [value]="p.id">{{ p.name }}</option>
+      </select>
+      <a *ngIf="selectedProjectId" [routerLink]="['/projects', selectedProjectId]" class="btn btn-primary">
+        Open Board
+      </a>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <div *ngIf="loading" class="loading-center">
+    <div class="spinner"></div> Loading tasks...
+  </div>
+
+  <div *ngIf="!loading && projects.length === 0" class="empty">
+    <div class="empty-icon">📁</div>
+    <div class="empty-title">No projects found</div>
+    <div class="empty-text">Create a project first to manage tasks</div>
+    <a routerLink="/projects" class="btn btn-primary">Go to Projects</a>
+  </div>
+
+  <div *ngIf="!loading && projects.length > 0">
+    <div *ngIf="filteredTasks.length === 0" class="empty">
+      <div class="empty-icon">✅</div>
+      <div class="empty-title">No tasks found</div>
+      <div class="empty-text">Add tasks from the project board</div>
+      <a [routerLink]="['/projects', selectedProjectId]" class="btn btn-primary">Open Board</a>
+    </div>
+
+    <div *ngIf="filteredTasks.length > 0" class="card">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Task</th>
+            <th>Status</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let t of filteredTasks">
+            <td>
+              <div style="font-weight:500;color:var(--text-primary)">{{ t.title }}</div>
+              <div *ngIf="t.description" style="font-size:12px;color:var(--text-muted);margin-top:2px">
+                {{ t.description | slice:0:80 }}{{ t.description.length > 80 ? '...' : '' }}
+              </div>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="statusClass(t.status)">{{ statusLabel(t.status) }}</span>
+            </td>
+            <td>
+              <span *ngIf="t.assignedUser" style="font-size:13px">{{ t.assignedUser.displayName }}</span>
+              <span *ngIf="!t.assignedUser" class="text-muted">—</span>
+            </td>
+            <td>
+              <span *ngIf="t.dueDate" style="font-size:13px" [style.color]="isOverdue(t.dueDate) ? 'var(--danger)' : ''">
+                {{ formatDate(t.dueDate) }}
+              </span>
+              <span *ngIf="!t.dueDate" class="text-muted">—</span>
+            </td>
+            <td>
+              <div class="flex gap-2">
+                <button *ngIf="statusNum(t.status) < 2" class="btn btn-secondary btn-sm"
+                        (click)="setStatus(t, statusNum(t.status) + 1)">
+                  {{ statusNum(t.status) === 0 ? '→ Start' : '→ Done' }}
+                </button>
+                <button *ngIf="statusNum(t.status) === 2" class="btn btn-secondary btn-sm"
+                        (click)="setStatus(t, 1)">↩ Reopen</button>
+                <button class="btn-icon" (click)="deleteTask(t.id)" style="color:var(--danger)">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

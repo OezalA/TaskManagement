@@ -1,0 +1,53 @@
+.back-link a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--text-muted);
+  text-decoration: none;
+  margin-bottom: 6px;
+}
+.back-link a:hover { color: var(--primary); }
+
+.kanban-empty {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 20px 0;
+}
+
+.task-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.assign-select {
+  font-size: 11px;
+  padding: 2px 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text-primary);
+  cursor: pointer;
+  max-width: 110px;
+}
+
+.done-card { opacity: 0.7; }
+.done-title { text-decoration: line-through; color: var(--text-muted); }
+
+.unassigned {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.overdue {
+  color: var(--danger) !important;
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .kanban { grid-template-columns: 1fr; }
+}

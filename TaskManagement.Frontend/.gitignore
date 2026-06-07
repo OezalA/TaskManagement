@@ -1,0 +1,37 @@
+# Angular
+dist/
+.angular/
+*.log
+node_modules/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment
+src/environments/environment.prod.ts
+.env
+.env.local
+
+# Dependencies
+package-lock.json
+yarn.lock
+
+# Build outputs
+*.js
+*.js.map
+*.d.ts
+!*.config.js
+!karma.conf.js
+
+# Testing
+coverage/
+.nyc_output/
+
+# Temporary
+tmp/
+temp/
