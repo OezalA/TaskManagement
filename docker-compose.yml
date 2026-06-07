@@ -1,6 +1,12 @@
-version: "3.9"
-
 services:
+  frontend:
+    build: ./TaskManagement.Frontend
+    container_name: taskmanagement_frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - api
+
   api:
     build: .
     container_name: taskmanagement_api

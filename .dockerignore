@@ -1,0 +1,12 @@
+# Backend build context (root) — keep it small and fast.
+**/bin
+**/obj
+**/node_modules
+**/dist
+**/.angular
+**/out-tsc
+.git
+.vs
+.vscode
+# The Angular app has its own build context (./TaskManagement.Frontend).
+TaskManagement.Frontend
